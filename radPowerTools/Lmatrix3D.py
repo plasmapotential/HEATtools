@@ -12,9 +12,10 @@ pt1 = np.array([1.657,0.02,-1.42])
 
 
 lMax = 1.0 #[m]
-Na = 1 #ranges from 0,pi/2
-Nb = 1 #ranges from 0,2pi
-Nl = 10
+Na = 2 #ranges from 0,pi/2
+Nb = 2 #ranges from 0,2pi
+Nl = 1000
+dl = lMax / Nl
 
 #read radiation R,Z,P file
 PC2D = pd.read_csv(radFile, header=0, names=['R','Z','P']).values #convert to m
@@ -90,11 +91,9 @@ for i,lN in enumerate(lNorm):
         continue
     else:
         lPt = ctr + lN*rays
-        print(rays)
-        print(lPt)
         r = np.sqrt(lPt[:,0]**2+lPt[:,1]**2)
         z = lPt[:,2]
-        em += f_PC(r,z)
+        em += f_PC(r,z) * dl
 
 print(em)
 r = rays_xyz.reshape(Na*Nb,3)
