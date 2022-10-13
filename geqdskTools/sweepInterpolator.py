@@ -26,20 +26,28 @@ sys.path.append(EFITPath)
 sys.path.append(HEATPath)
 import MHDClass
 
-rootPath = '/home/tom/HEATruns/SPARC/sweep7_T4/halfPeriod/'
-outPath = '/home/tom/HEATruns/SPARC/sweep7_T4/S_interpolated/'
+#geqdsks in
+rootPath = '/home/tom/HEATruns/SPARC/sweep7_T5/originalGEQDSKs/'
+#geqdsks out
+outPath = '/home/tom/HEATruns/SPARC/sweep7_T5/interpGEQDSK_T5_triangular_dt10ms_vSweep0.5ms/'
 
 #segments along a divertor tile
 #v2a
-r0 = 1.578
-r1 = 1.82
-z0 = -1.303
-z1 = -1.6
+#r0 = 1.578
+#r1 = 1.82
+#z0 = -1.303
+#z1 = -1.6
 #v2y
 #r0 = 1.5872
 #r1 = 1.7899
 #z0 = -1.3214
 #z1 = -1.6092
+#T5 bottom
+r0 = 1.72
+r1 = 1.84
+z0 = -1.575
+z1 = -1.575
+
 rMag = r1-r0
 zMag = np.abs(z1-z0)
 sMag = np.sqrt(rMag**2+zMag**2)
@@ -63,7 +71,7 @@ f_tS = interp1d(S_csv[:tMidIdx,1], S_csv[:tMidIdx,0], kind='linear')
 
 #generate t and S using user inputs
 #timestep width
-dtMax = 0.007 #[s]
+dtMax = 0.001 #[s]
 #number of periods to stitch
 Np = 1
 
@@ -74,7 +82,8 @@ mode='manual'
 #define tMax manually
 if mode=='manual':
     #tMax = 0.735 #[s] #quadratic
-    tMax = 0.651 #[s] #triangle
+    #tMax = 0.651 #[s] #triangle
+    tMax = 0.3 #[s] #T5
     dt = dtMax
 #define tMax using Sweep Trajectory final timestep and common factors
 #inds the largest factor of the final timestep that is less than dtMax
@@ -82,7 +91,7 @@ if mode=='manual':
 else:
     tMax = np.round(S_csv[-1,0], 3)
     fact = np.array(factors(tMax*1000))
-    use = np.where(fact < dtMax*1000.0)[0]
+    use = np.where(fact <= dtMax*1000.0)[0]
 
     if len(fact) == 0:
         print("Cannot find a factor.")
@@ -95,7 +104,6 @@ ts = np.linspace(0.0, Np*tMax, Nsteps+1)
 
 print("Found dt = {:f} [s]".format(dt))
 print(ts)
-input()
 S = f_St(ts)
 
 #calculate S
@@ -128,6 +136,7 @@ MHD = MHDClass.setupForTerminalUse(gFile=[rootPath+x for x in gFileList])
 MHD.Spols = S_gFiles
 for i,t in enumerate(ts):
     #interpolate this timestep
+    print(S[i])
     ep = MHD.gFileInterpolateByS(S[i])
 
     #here we are changing sign of Ip for a specific use case (flipping helicity)

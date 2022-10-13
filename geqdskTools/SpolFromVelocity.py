@@ -31,7 +31,7 @@ vMax = 0.5 #[m/s]
 turnTime = .08 #[s]
 #min / max S of sweep
 minS = 0.0 #[m]
-maxS = 0.110 #[m] for T5 calcs
+maxS = 0.076#[m] for T5 calcs
 #maxS = 0.230 #[m] tune this to get your objective maxS with the triangle
 #maxS = 0.2575 #for quad with 230mm extent
 deltaS = maxS - minS

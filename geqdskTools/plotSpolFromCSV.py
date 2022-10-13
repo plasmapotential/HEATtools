@@ -17,14 +17,16 @@ tMidIdx = np.argmax(S_csv[:,1])
 #create function for forward interpolation
 f_St = interp1d(S_csv[:,0], S_csv[:,1], kind='linear')
 #create monotonic function for inverse interpolation
-f_tS = interp1d(S_csv[:tMidIdx,1], S_csv[:tMidIdx,0], kind='linear')
+f_tS = interp1d(S_csv[:tMidIdx,1], S_csv[:tMidIdx,0], kind='linear', fill_value="extrapolate")
 
 #user specified points to overlay onto plot (get these from sPolFromGfile.py)
 S1 = [0.02427542, 0.03559984, 0.04740993, 0.05975101, 0.07267976, 0.08626334, 0.10058658]
 
+S1 = S1 - np.min(S1)
+
 #user supplies dt that corresponds to new GEQDSK interpolation timestep
-dt = 0.007
-tMax = S_csv[-1,0]
+dt = 0.001
+tMax = S_csv[-1,0] / 2
 Nt = int(tMax/dt)
 t0 = np.linspace(0,tMax,Nt+1)
 print(t0)

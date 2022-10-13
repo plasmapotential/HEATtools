@@ -24,8 +24,8 @@ sys.path.append(HEATPath)
 import MHDClass
 import GUIscripts.plotly2DEQ as pEQ
 
-rootPath = '/home/tom/HEATruns/SPARC/sweep7_T4/S_interpolated_vSweep0.7_dt7ms_10s/'
-outPath = '/home/tom/HEATruns/SPARC/sweep7_T4/EQimages/'
+rootPath = '/home/tom/HEATruns/SPARC/sweep7_T4/S_interpolated_vSweep0.7_dt7ms_quad_10s/'
+outPath = '/home/tom/HEATruns/SPARC/sweep7_T4/EQimages_quad_10s/'
 
 #height in pixels
 h = 600
