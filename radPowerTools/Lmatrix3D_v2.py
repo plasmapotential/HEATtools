@@ -74,4 +74,7 @@ vecUVW = np.matmul(vec, uvw.T)
 angles = np.zeros((Ni,Nj,2))
 for i in range(Ni):
     for j in range(Nj):
+        #alpha
         angles[i,j,0] =
+        #beta
+        angles[i,j,1] =
