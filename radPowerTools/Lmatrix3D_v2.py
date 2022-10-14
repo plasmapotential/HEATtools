@@ -87,6 +87,7 @@ for i in range(Ni):
 #print(angles)
 #print(np.degrees(angles))
 
+#YOU ARE HERE!!!
 #now calculate L matrix
 L = np.zeros((Ni,Nj))
 for i in range(Ni):
