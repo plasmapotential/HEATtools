@@ -13,17 +13,19 @@ Nb = 1 #ranges from 0,pi
 phi = 0.0
 
 #read 2D radiation R,Z,P file
-PC2D = pd.read_csv(radFile, header=0, names=['R','Z','P']).values #convert to m
+#PC2D = pd.read_csv(radFile, header=0, names=['R','Z','P']).values #convert to m
+PC2D = np.array([[1.67,0.008,-1.42]])
+
 Ni = len(PC2D)
 Nj = Na*Nb
 #calculate 3D coordinates at phi
 radXYZ  = np.zeros((Ni,3))
 radXYZ[:,0] = PC2D[:,0] * np.cos(phi)
-radXYZ[:,1] = PC2D[:,0] * np.sin(phi)
-radXYZ[:,2] = PC2D[:,1]
+radXYZ[:,1] = PC2D[:,1] * np.sin(phi)
+radXYZ[:,2] = PC2D[:,2]
 
 #build 2D interpolator
-f_PC = LinearNDInterpolator(PC2D[:,0:2],PC2D[:,2], fill_value=0)
+#f_PC = LinearNDInterpolator(PC2D[:,0:2],PC2D[:,2], fill_value=0)
 
 #build local coordinate system
 W = norm
@@ -32,11 +34,11 @@ V = np.cross(W,U)
 u = U / np.linalg.norm(U)
 v = V / np.linalg.norm(V)
 w = W / np.linalg.norm(W)
-uvw = np.vstack([u,v,w])
+uvw2xyz = np.vstack([u,v,w])
 #print(u)
 #print(v)
 #print(w)
-print(uvw)
+print(uvw2xyz)
 
 #discretize the half hemisphere along w in bin centers
 pdf_a = lambda x: np.sin(x)/2.0
@@ -67,14 +69,29 @@ bSlices = inverseCDF(cdfSlices_b)
 
 #calculate distance from ctr to each source object
 vec = radXYZ - ctr
-d = np.linalg.norm(vec, axis=1)
-vecUVW = np.matmul(vec, uvw.T)
 
+UVW = np.matmul(vec, uvw2xyz.T)
+l = np.linalg.norm(UVW, axis=1)
 #calculate which half hemisphere cell the ray from ctr to each rad pt is in
 angles = np.zeros((Ni,Nj,2))
 for i in range(Ni):
+    u0 = np.round(UVW[i,0], 8)
+    v0 = np.round(UVW[i,1], 8)
+    w0 = np.round(UVW[i,2], 8)
+    #alpha
+    angles[i,:,0] = np.round(np.arcsin(w0), 8)
+    #beta
+    angles[i,:,1] = np.round(np.arcsin( v0 / np.cos(angles[i,:,0]) ), 8)
+
+
+#print(angles)
+#print(np.degrees(angles))
+
+#now calculate L matrix
+L = np.zeros((Ni,Nj))
+for i in range(Ni):
     for j in range(Nj):
-        #alpha
-        angles[i,j,0] =
-        #beta
-        angles[i,j,1] =
+        #check if ray is inside this j
+
+        #assign distance to vector
+        L[i,j]
