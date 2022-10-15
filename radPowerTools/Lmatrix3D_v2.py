@@ -1,23 +1,37 @@
+#Lmatrix3D.py
+#Description:   Builds Reinke's L-matrix in 3D from 1 target pt and RZ emmision
+#               grid points. Samples uniformly in solid angle.
+#Engineer:      T Looby
+#Date:          20221014
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d, LinearNDInterpolator
 
+#input file with RZ coordinates of mesh grid centers in columns 0,1
 radFile = '/home/tom/source/dummyOutput/RZpower.csv'
+#file for saving glyphs to visualize rays in paraview
 glyphFile = '/home/tom/source/dummyOutput/glyph.csv'
-
+#point where we are calculating the flux
 ctr = np.array([1.657,0.008,-1.42]) #[m]
+#normal vector of the face on which we calculate flux
 norm = np.array([1.0, 0.0, 0.0])
+#another point on the face
 pt1 = np.array([1.657,0.02,-1.42])
-Na = 1 #ranges from 0,pi
-Nb = 1 #ranges from 0,pi
+#number of samples in alpha, ranges from (0,pi), polar angle
+Na = 2 #ranges from 0,pi
+#number of samples in beta, ranges from (0,pi), azimuthal angle
+Nb = 2 #ranges from 0,pi
+#toroidal location of the RZ emission grid
 phi = 0.0
 
 #read 2D radiation R,Z,P file
 #PC2D = pd.read_csv(radFile, header=0, names=['R','Z','P']).values #convert to m
+#for testing, a single point
 PC2D = np.array([[1.67,0.008,-1.42]])
 
 Ni = len(PC2D)
 Nj = Na*Nb
+
 #calculate 3D coordinates at phi
 radXYZ  = np.zeros((Ni,3))
 radXYZ[:,0] = PC2D[:,0] * np.cos(phi)
@@ -41,6 +55,7 @@ uvw2xyz = np.vstack([u,v,w])
 #print(uvw2xyz)
 
 #discretize the half hemisphere along w in bin centers
+#alpha: polar angle, ranges from (0,pi), pi/2 points along face normal
 pdf_a = lambda x: np.sin(x)/2.0 #normalized angle pdf
 a = np.linspace(0,np.pi,100000)
 alpha = pdf_a(a)
@@ -51,8 +66,7 @@ cdfSlices_a = np.diff(cdfBounds_a)/2.0 + cdfBounds_a[:-1]
 inverseCDF_a = interp1d(cdf_a, a, kind='linear')
 aSlices = inverseCDF_a(cdfSlices_a)
 aBounds = inverseCDF_a(cdfBounds_a)
-#beta
-# alpha
+#beta: azimuthal angle, ranges from (0,pi)
 pdf_b = lambda x: [1.0/np.pi for i in x] #normalized angle PDF
 b = np.linspace(0,np.pi,100000) #only half hemisphere
 beta = pdf_b(b)
@@ -64,6 +78,10 @@ inverseCDF_b = interp1d(cdf_b, b, kind='linear')
 bSlices = inverseCDF_b(cdfSlices_b)
 bBounds = inverseCDF_b(cdfBounds_b)
 
+aTmp = np.repeat(aBounds[:,np.newaxis], Nb, axis=1)
+bTmp = np.repeat(bBounds[np.newaxis,:], Na, axis=1)
+ab2j = np.hstack([aTmp.flatten(),bTmp.flatten()]).reshape(Nj+2,2)
+
 #print(np.degrees(aSlices))
 #print(np.degrees(bSlices))
 print(np.degrees(aBounds))
@@ -71,49 +89,46 @@ print(np.degrees(bBounds))
 #print(cdfBounds_a)
 #print(cdfBounds_b)
 
-
 #calculate distance from ctr to each source object
 vec = radXYZ - ctr
 l = np.linalg.norm(vec, axis=1)
 UVW = np.matmul(vec, uvw2xyz.T)
 
-#calculate which half hemisphere cell the ray from ctr to each rad pt is in
-angles = np.zeros((Ni,Nj,2))
+#calculate angles to source points
+angles = np.zeros((Ni,2))
 for i in range(Ni):
     u0 = np.round(UVW[i,0], 8)
     v0 = np.round(UVW[i,1], 8)
     w0 = np.round(UVW[i,2], 8)
     #alpha
-    angles[i,:,0] = np.round(np.arcsin(w0), 8)
+    angles[i,0] = np.round(np.arcsin(w0), 8)
     #beta
-    angles[i,:,1] = np.round(np.arcsin( v0 / np.cos(angles[i,:,0]) ), 8)
+    angles[i,1] = np.round(np.arcsin( v0 / np.cos(angles[i,0]) ), 8)
 #print(angles)
-#print(np.degrees(angles))
+print(np.degrees(angles))
 
 #now calculate L matrix
 L = np.zeros((Ni,Nj))
 for i in range(Ni):
     for j in range(Nj):
+        #THIS DOESNT WORK.  NEED TO CHECK ANGLE COMBO j directly
         #alpha
         for k in range(len(aBounds)-1):
             #check if ray is inside this j
-            if (angles[i,j,0] >= aBounds[k]) and (angles[i,j,0] <= aBounds[k+1]):
-                aFlag = True
+            if (angles[i,0] >= aBounds[k]) and (angles[i,0] <= aBounds[k+1]):
+                aFlag = k
             else:
                 aFlag = False
         #beta
         for k in range(len(bBounds)-1):
             #check if ray is inside this j
-            if (angles[i,j,1] >= bBounds[k]) and (angles[i,j,1] <= bBounds[k+1]):
-                bFlag = True
+            if (angles[i,1] >= bBounds[k]) and (angles[i,1] <= bBounds[k+1]):
+                bFlag = k
             else:
                 bFlag = False
-        if aFlag == True and bFlag == True:
-            L[i,j] = l[i]
-            
+        if aFlag != False and bFlag != False:
+            L[i,ab2j[aFlag,bFlag]] = l[i]
 #scale to account for fractional component of solid angle
 L *= 2*np.pi / Nj
 
 print(L)
-
-#now you need to scale by fractional solid angle
