@@ -12,7 +12,7 @@ radFile = '/home/tom/source/dummyOutput/RZpower.csv'
 #file for saving glyphs to visualize rays in paraview
 glyphFile = '/home/tom/source/dummyOutput/glyph.csv'
 #point where we are calculating the flux
-ctr = np.array([1.657,0.008,-1.42]) #[m]
+ctr = np.array([1.657,0.0,-1.42]) #[m]
 #normal vector of the face on which we calculate flux
 norm = np.array([1.0, 0.0, 0.0])
 #another point on the face
@@ -21,22 +21,27 @@ pt1 = np.array([1.657,0.02,-1.42])
 Na = 2 #ranges from 0,pi
 #number of samples in beta, ranges from (0,pi), azimuthal angle
 Nb = 2 #ranges from 0,pi
-#toroidal location of the RZ emission grid
+#toroidal location of the RZ emission grid [degrees]
 phi = 0.0
+
+#various glyph objects that can be saved
+saveBinCtrRays = False #each bin ctr
+saveSrcTgtRays = True #source to target vectors
+
 
 #read 2D radiation R,Z,P file
 #PC2D = pd.read_csv(radFile, header=0, names=['R','Z','P']).values #convert to m
 #for testing, a single point
-PC2D = np.array([[1.67,0.008,-1.42]])
+PC2D = np.array([[2.0, -1.42], [2.0, -0.5]])
 
 Ni = len(PC2D)
 Nj = Na*Nb
 
 #calculate 3D coordinates at phi
 radXYZ  = np.zeros((Ni,3))
-radXYZ[:,0] = PC2D[:,0] * np.cos(phi)
-radXYZ[:,1] = PC2D[:,1] * np.sin(phi)
-radXYZ[:,2] = PC2D[:,2]
+radXYZ[:,0] = PC2D[:,0] * np.cos(np.radians(phi))
+radXYZ[:,1] = PC2D[:,0] * np.sin(np.radians(phi))
+radXYZ[:,2] = PC2D[:,1]
 
 #build 2D interpolator
 #f_PC = LinearNDInterpolator(PC2D[:,0:2],PC2D[:,2], fill_value=0)
@@ -78,57 +83,135 @@ inverseCDF_b = interp1d(cdf_b, b, kind='linear')
 bSlices = inverseCDF_b(cdfSlices_b)
 bBounds = inverseCDF_b(cdfBounds_b)
 
-aTmp = np.repeat(aBounds[:,np.newaxis], Nb, axis=1)
-bTmp = np.repeat(bBounds[np.newaxis,:], Na, axis=1)
-ab2j = np.hstack([aTmp.flatten(),bTmp.flatten()]).reshape(Nj+2,2)
-
 #print(np.degrees(aSlices))
 #print(np.degrees(bSlices))
+print("bounds")
 print(np.degrees(aBounds))
 print(np.degrees(bBounds))
 #print(cdfBounds_a)
 #print(cdfBounds_b)
 
 #calculate distance from ctr to each source object
+
+
+
+###====SOMETHING IS BROKEN IN HERE.  USE THE GLYPHs AT THE BOTTOM TO TROUBLESHOOT.
+###====ANGLES ARE NOT LINING UP WITH INTENDED COORDINATE SYSTEM
 vec = radXYZ - ctr
 l = np.linalg.norm(vec, axis=1)
 UVW = np.matmul(vec, uvw2xyz.T)
 
+print("trr")
+print(vec)
+print(UVW)
 #calculate angles to source points
 angles = np.zeros((Ni,2))
 for i in range(Ni):
     u0 = np.round(UVW[i,0], 8)
     v0 = np.round(UVW[i,1], 8)
     w0 = np.round(UVW[i,2], 8)
+    l0 = np.sqrt(u0**2+v0**2+w0**2)
+    u0 /= l0
+    v0 /= l0
+    w0 /= l0
+
     #alpha
     angles[i,0] = np.round(np.arcsin(w0), 8)
     #beta
-    angles[i,1] = np.round(np.arcsin( v0 / np.cos(angles[i,0]) ), 8)
+    angles[i,1] = np.round(np.arcsin( np.round(v0 / np.cos(angles[i,0]), 8) ), 8)
+
+print("angles")
 #print(angles)
 print(np.degrees(angles))
 
 #now calculate L matrix
+
 L = np.zeros((Ni,Nj))
+angleMap = np.zeros((Nj,2)) #keeps track of angles as a function of j
 for i in range(Ni):
-    for j in range(Nj):
-        #THIS DOESNT WORK.  NEED TO CHECK ANGLE COMBO j directly
-        #alpha
-        for k in range(len(aBounds)-1):
-            #check if ray is inside this j
-            if (angles[i,0] >= aBounds[k]) and (angles[i,0] <= aBounds[k+1]):
-                aFlag = k
-            else:
-                aFlag = False
-        #beta
-        for k in range(len(bBounds)-1):
-            #check if ray is inside this j
-            if (angles[i,1] >= bBounds[k]) and (angles[i,1] <= bBounds[k+1]):
-                bFlag = k
+    jIdx=0
+    #we loop thru j by looping through alpha and beta
+    for j1 in range(Na):
+        aLo = aBounds[j1]
+        aHi = aBounds[j1+1]
+        if angles[i,0] >= aLo and angles[i,0] <= aHi:
+            aFlag = True
+        else:
+            aFlag = False
+        for k in range(Nb):
+            bLo = bBounds[k]
+            bHi = bBounds[k+1]
+            if angles[i,1] >= bLo and angles[i,1] <= bHi:
+                bFlag = True
             else:
                 bFlag = False
-        if aFlag != False and bFlag != False:
-            L[i,ab2j[aFlag,bFlag]] = l[i]
+
+            if aFlag != False and bFlag != False:
+                L[i,jIdx] = l[i]
+
+            #map angles back to j (where Nj=Na*Nb)
+            angleMap[jIdx,0] = aSlices[j1]
+            angleMap[jIdx,1] = bSlices[k]
+            jIdx+=1
+
 #scale to account for fractional component of solid angle
 L *= 2*np.pi / Nj
 
+print("L matrix")
 print(L)
+print(L.shape)
+
+#create rays of length l in the direction of each bin center
+if saveBinCtrRays == True:
+    rays_xyz = np.zeros((Na,Nb,3))
+    for i,a in enumerate(aSlices):
+        for j,b in enumerate(bSlices):
+#            uRay = max(l) * np.cos(a) * np.sin(b)
+#            vRay = max(l) * np.cos(a) * np.cos(b)
+#            wRay = max(l) * np.sin(a)
+#            uRay = max(l) * np.cos(a) * np.cos(b)
+#            vRay = max(l) * np.cos(a) * np.sin(b)
+#            wRay = max(l) * np.sin(a)
+            uRay = max(l) * np.cos(a) * np.cos(b)
+            vRay = max(l) * np.cos(a)
+            wRay = max(l) * np.sin(a) * np.sin(b)
+            rays_uvw = np.array([uRay,vRay,wRay])
+            rays_xyz[i,j,:] = np.matmul(rays_uvw, uvw2xyz)
+
+    #save bin center rays to CSV
+    r = rays_xyz.reshape(Na*Nb,3)
+    pc = np.zeros((Na*Nb, 6))
+    pc[:,0] = ctr[0]*1000.0
+    pc[:,1] = ctr[1]*1000.0
+    pc[:,2] = ctr[2]*1000.0
+    pc[:,3] = r[:,0]*1000.0
+    pc[:,4] = r[:,1]*1000.0
+    pc[:,5] = r[:,2]*1000.0
+    head = "X,Y,Z,vx,vy,vz"
+    np.savetxt(glyphFile, pc, delimiter=',',fmt='%.10f', header=head)
+
+#(iHat*vx) + (jHat*vy) + (kHat*vz)
+
+#create rays between source and target points
+if saveSrcTgtRays == True:
+    rays_xyz = np.zeros((Ni,3))
+    for i in range(Ni):
+        #uRay = l[i] * np.cos(angles[i,0]) * np.cos(angles[i,1])
+        #vRay = l[i] * np.cos(angles[i,0]) * np.sin(angles[i,1])
+        #wRay = l[i] * np.sin(angles[i,0])
+        uRay = l[i] * np.cos(angles[i,0]) * np.cos(angles[i,1])
+        vRay = l[i] * np.cos(angles[i,0])
+        wRay = l[i] * np.sin(angles[i,0]) * np.sin(angles[i,1])
+        rays_uvw = np.array([uRay,vRay,wRay])
+        rays_xyz[i,:] = np.matmul(rays_uvw, uvw2xyz)
+    #save vectors to source points to CSV
+    r = rays_xyz.reshape(Ni,3)
+    pc = np.zeros((Ni, 6))
+    pc[:,0] = ctr[0]*1000.0
+    pc[:,1] = ctr[1]*1000.0
+    pc[:,2] = ctr[2]*1000.0
+    pc[:,3] = r[:,0]*1000.0
+    pc[:,4] = r[:,1]*1000.0
+    pc[:,5] = r[:,2]*1000.0
+    head = "X,Y,Z,vx,vy,vz"
+    np.savetxt(glyphFile, pc, delimiter=',',fmt='%.10f', header=head)
