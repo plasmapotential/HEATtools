@@ -18,11 +18,11 @@ norm = np.array([1.0, 0.0, 0.0])
 #another point on the face
 pt1 = np.array([1.657,0.02,-1.42])
 #number of samples in alpha, ranges from (0,pi), polar angle
-Na = 2 #ranges from 0,pi
+Na = 5 #ranges from 0,pi
 #number of samples in beta, ranges from (0,pi), azimuthal angle
-Nb = 2 #ranges from 0,pi
+Nb = 5 #ranges from 0,pi
 #toroidal location of the RZ emission grid [degrees]
-phi = 0.0
+phi = -10.0
 
 #various glyph objects that can be saved
 saveBinCtrRays = False #each bin ctr
@@ -31,8 +31,8 @@ saveSrcTgtRays = True #source to target vectors
 
 #read 2D radiation R,Z,P file
 #PC2D = pd.read_csv(radFile, header=0, names=['R','Z','P']).values #convert to m
-#for testing, a single point
-PC2D = np.array([[2.0, -1.42], [2.0, -0.5]])
+#for testing, a user defined point
+PC2D = np.array([[3.0, -1.7], [2.0, -0.5]])
 
 Ni = len(PC2D)
 Nj = Na*Nb
@@ -92,16 +92,11 @@ print(np.degrees(bBounds))
 #print(cdfBounds_b)
 
 #calculate distance from ctr to each source object
-
-
-
-###====SOMETHING IS BROKEN IN HERE.  USE THE GLYPHs AT THE BOTTOM TO TROUBLESHOOT.
-###====ANGLES ARE NOT LINING UP WITH INTENDED COORDINATE SYSTEM
 vec = radXYZ - ctr
 l = np.linalg.norm(vec, axis=1)
 UVW = np.matmul(vec, uvw2xyz.T)
 
-print("trr")
+print("vectors")
 print(vec)
 print(UVW)
 #calculate angles to source points
@@ -117,8 +112,10 @@ for i in range(Ni):
 
     #alpha
     angles[i,0] = np.round(np.arcsin(w0), 8)
+    if v0 < 0:
+        angles[i,0] += np.pi/2.0
     #beta
-    angles[i,1] = np.round(np.arcsin( np.round(v0 / np.cos(angles[i,0]), 8) ), 8)
+    angles[i,1] = np.round(np.arccos( np.round(u0 / np.cos(angles[i,0]), 8) ), 8)
 
 print("angles")
 #print(angles)
