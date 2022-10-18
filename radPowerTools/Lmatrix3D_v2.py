@@ -11,6 +11,8 @@ from scipy.interpolate import interp1d, LinearNDInterpolator
 radFile = '/home/tom/source/dummyOutput/RZpower.csv'
 #file for saving glyphs to visualize rays in paraview
 glyphFile = '/home/tom/source/dummyOutput/glyph.csv'
+#file for saving L matrix
+LmatFile = '/home/tom/source/dummyOutput/Lmatrix.csv'
 #point where we are calculating the flux
 ctr = np.array([1.657,0.0,-1.42]) #[m]
 #normal vector of the face on which we calculate flux
@@ -22,17 +24,18 @@ Na = 5 #ranges from 0,pi
 #number of samples in beta, ranges from (0,pi), azimuthal angle
 Nb = 5 #ranges from 0,pi
 #toroidal location of the RZ emission grid [degrees]
-phi = -10.0
+phi = 0.0
 
-#various glyph objects that can be saved
+#various objects that can be saved
 saveBinCtrRays = False #each bin ctr
-saveSrcTgtRays = True #source to target vectors
+saveSrcTgtRays = False #source to target vectors
+saveLmatrix = True #save L matrix in ixj csv file
 
 
 #read 2D radiation R,Z,P file
 #PC2D = pd.read_csv(radFile, header=0, names=['R','Z','P']).values #convert to m
 #for testing, a user defined point
-PC2D = np.array([[3.0, -1.7], [2.0, -0.5]])
+PC2D = np.array([[3.0, -1.7], [2.0, -0.5], [3.0, -1.4]])
 
 Ni = len(PC2D)
 Nj = Na*Nb
@@ -121,8 +124,7 @@ print("angles")
 #print(angles)
 print(np.degrees(angles))
 
-#now calculate L matrix
-
+#calculate L matrix
 L = np.zeros((Ni,Nj))
 angleMap = np.zeros((Nj,2)) #keeps track of angles as a function of j
 for i in range(Ni):
@@ -152,7 +154,11 @@ for i in range(Ni):
             jIdx+=1
 
 #scale to account for fractional component of solid angle
-L *= 2*np.pi / Nj
+#because we sampled uniformly in solid angle all bins have equal weight, dOmega
+#we also divide normalize to entire solid angle, 4pi
+#remember that we only sampled from half hemisphere (normal to mesh face)
+dOmega = 2*np.pi / Nj
+L *= dOmega / (4 * np.pi)
 
 print("L matrix")
 print(L)
@@ -163,12 +169,6 @@ if saveBinCtrRays == True:
     rays_xyz = np.zeros((Na,Nb,3))
     for i,a in enumerate(aSlices):
         for j,b in enumerate(bSlices):
-#            uRay = max(l) * np.cos(a) * np.sin(b)
-#            vRay = max(l) * np.cos(a) * np.cos(b)
-#            wRay = max(l) * np.sin(a)
-#            uRay = max(l) * np.cos(a) * np.cos(b)
-#            vRay = max(l) * np.cos(a) * np.sin(b)
-#            wRay = max(l) * np.sin(a)
             uRay = max(l) * np.cos(a) * np.cos(b)
             vRay = max(l) * np.cos(a)
             wRay = max(l) * np.sin(a) * np.sin(b)
@@ -186,16 +186,12 @@ if saveBinCtrRays == True:
     pc[:,5] = r[:,2]*1000.0
     head = "X,Y,Z,vx,vy,vz"
     np.savetxt(glyphFile, pc, delimiter=',',fmt='%.10f', header=head)
-
-#(iHat*vx) + (jHat*vy) + (kHat*vz)
+    print("Saved glyphs of bin centers")
 
 #create rays between source and target points
 if saveSrcTgtRays == True:
     rays_xyz = np.zeros((Ni,3))
     for i in range(Ni):
-        #uRay = l[i] * np.cos(angles[i,0]) * np.cos(angles[i,1])
-        #vRay = l[i] * np.cos(angles[i,0]) * np.sin(angles[i,1])
-        #wRay = l[i] * np.sin(angles[i,0])
         uRay = l[i] * np.cos(angles[i,0]) * np.cos(angles[i,1])
         vRay = l[i] * np.cos(angles[i,0])
         wRay = l[i] * np.sin(angles[i,0]) * np.sin(angles[i,1])
@@ -212,3 +208,11 @@ if saveSrcTgtRays == True:
     pc[:,5] = r[:,2]*1000.0
     head = "X,Y,Z,vx,vy,vz"
     np.savetxt(glyphFile, pc, delimiter=',',fmt='%.10f', header=head)
+    print("Saved glyphs of angles to sources")
+
+#use this command in Paraview calculator to view glyphs
+#(iHat*vx) + (jHat*vy) + (kHat*vz)
+
+if saveLmatrix == True:
+    np.savetxt(LmatFile, L, delimiter=',', fmt='%.10f')
+    print("Saved L matrix to ixj CSV file")
