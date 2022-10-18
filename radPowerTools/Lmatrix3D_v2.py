@@ -1,6 +1,7 @@
 #Lmatrix3D.py
 #Description:   Builds Reinke's L-matrix in 3D from 1 target pt and RZ emmision
-#               grid points. Samples uniformly in solid angle.
+#               grid points. Samples uniformly in solid angle over half hemishpere
+#               normal to mesh triangle face
 #Engineer:      T Looby
 #Date:          20221014
 import numpy as np
