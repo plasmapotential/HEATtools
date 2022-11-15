@@ -19,30 +19,32 @@ import MHDClass
 
 
 #edit these
-rootPath = '/home/tom/work/CFS/GEQDSKs/sweep7/'
+rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/V2g01a/'
+#sweep7
 gFileList = [
-            'geqdsk_freegsu_run0.geq',
-            'geqdsk_freegsu_run1.geq',
-            'geqdsk_freegsu_run2.geq',
-            'geqdsk_freegsu_run3.geq',
-            'geqdsk_freegsu_run4.geq',
-            'geqdsk_freegsu_run5.geq',
-            'geqdsk_freegsu_run6.geq',
-            'geqdsk_freegsu_run7.geq',
-            'geqdsk_freegsu_run8.geq',
-            'geqdsk_freegsu_run9.geq',
+            'geqdsk_0',
+            'geqdsk_1',
+            'geqdsk_2',
+            'geqdsk_3',
+            'geqdsk_4',
+            'geqdsk_5',
+            'geqdsk_6',
+            'geqdsk_7',
+            'geqdsk_8',
+            'geqdsk_9',
+            'geqdsk_10',
             ]
 
 
 wallFile = '/home/tom/work/CFS/GEQDSKs/v2y.csv'
 newSuffix = '_v2y_negPsi_negBt_negIp_negFpol'
-newPath = '/home/tom/work/CFS/GEQDSKs/sweep7_v2y/'
+newPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/V2g01a/v2y/'
 
 shot = 1
 df = pd.read_csv(wallFile, names=['R','Z'])
 
 for gFile in gFileList:
-    newGFile = gFile + '_newWall_negPsi'
+    newGFile = gFile + newSuffix
     #copy file to tmp location with new name so that EP class can read it
     gRenamed = newPath+'g000001.00001'
     shutil.copyfile(rootPath+gFile, gRenamed)
