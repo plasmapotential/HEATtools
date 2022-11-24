@@ -1,5 +1,5 @@
 #csv2vtpVectorField.py
-#Description:  creates .vtk file from a .csv file
+#Description:  creates .vtp file from a .csv file
 #              user supplies csv file with x,y,z,Vx,VyV, z columns
 #Engineer:      T Looby
 #Date:          20221108

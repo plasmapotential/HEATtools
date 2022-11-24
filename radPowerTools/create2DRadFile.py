@@ -25,7 +25,7 @@ zMax = -1.4525
 NZ = 20
 
 
-#minor radius
+#minor radius #[m]
 a = 0.02
 #Total power
 Ptotal = 4.212 #MW
