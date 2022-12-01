@@ -24,11 +24,13 @@ sys.path.append(HEATPath)
 import MHDClass
 import GUIscripts.plotly2DEQ as pEQ
 
-rootPath = '/home/tom/HEATruns/SPARC/sweep7_T4/S_interpolated_vSweep0.7_dt7ms_quad_10s/'
-outPath = '/home/tom/HEATruns/SPARC/sweep7_T4/EQimages_quad_10s/'
+rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/interpolated/'
+outPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/EQplots/'
 
 #height in pixels
-h = 600
+h = 900
+xBox = [1.0, 2.8]
+yBox = [-1.7, 1.7]
 
 #read all files with a prefix
 prefix = 'g000001'
@@ -39,7 +41,7 @@ for i,g in enumerate(gFileList):
     MHD = MHDClass.setupForTerminalUse(gFile=f)
     ep = MHD.ep
     fig = pEQ.makePlotlyEQDiv(1, ep.g['time'], 'sparc', ep, height=h, gfile=None, logFile=False,
-                                bg='#252625', xRange=[1.2, 1.9], yRange=[-1.5, -1.0])
+                                bg='#252625', xRange=xBox, yRange=yBox)
     #for timestep in name
     #fig.write_image(outPath+'{:05d}.png'.format(ep.g['time']))
     #for index in name
