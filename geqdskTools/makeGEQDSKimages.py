@@ -24,11 +24,11 @@ sys.path.append(HEATPath)
 import MHDClass
 import GUIscripts.plotly2DEQ as pEQ
 
-rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/interpolated/'
+rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/interpolated_25ms/'
 outPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/EQplots/'
 
 #height in pixels
-h = 900
+h = 820
 xBox = [1.0, 2.8]
 yBox = [-1.7, 1.7]
 

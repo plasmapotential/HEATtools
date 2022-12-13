@@ -6,13 +6,8 @@ import numpy as np
 #name of each PFC
 #root = '/home/tom/results/sparc_1stRuns/sweep7/sparc_000001_sweep7/openFoam/heatFoam/'
 #root = '/home/tom/HEAT/data/sparc_000001_sweep7/openFoam/heatFoam/'
-#root = '/home/tom/results/SPARC/time2Recryst/'
-#root = '/home/tom/HEAT/data/sparc_000001_sweep7_10s_80msQuadTurn/openFoam/heatFoam/'
-#root = '/home/tom/HEAT/data/sparc_000001_sweep7_axisymmetricT4/openFoam/heatFoam/'
-#root = '/home/tom/HEAT/data/sparc_000001_sweep7_triangle/openFoam/heatFoam/'
-#root = '/home/tom/HEAT/data/sparc_000001_sweep7_axisymmetricT4_1sQuad/openFoam/heatFoam/'
-#root = '/home/tom/HEAT/data/sparc_000001_sweep7_T5_triangle/openFoam/heatFoam/'
-root = '/home/tom/HEAT/data/sparc_000001_ASCOTcoupling/openFoam/heatFoam/'
+root = '/home/tom/HEAT/data/sparc_000001_rampup_TSCvh01a_1mm_2lq/openFoam/heatFoam/'
+#root = '/media/tom/8f18dea0-fd98-4cd0-8dcf-0af04aad82c4/work/resultsCFS/TSC_rampup_dec2022/sparc_000001_rampup_TSCvh01a_ramped4MW_dt100ms/openFoam/heatFoam/'
 
 nombres = [f.name for f in os.scandir(root) if f.is_dir()]
 nombres.sort()

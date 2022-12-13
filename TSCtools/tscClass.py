@@ -1,0 +1,215 @@
+#tscClass.py
+#description:   class object for TSC output file IO.  used by other files
+#date:          Nov 2021
+#engineer:      T Looby
+import numpy as np
+
+class tscIO:
+    def __init__(self, aFile):
+        """
+        aFile is outputa file from TSC
+        """
+        self.aFile = aFile
+        return
+
+
+    def readRhoProfile(self):
+        """
+        read radial coordinate rho.
+        """
+        print("Reading Rho Profiles...")
+        switch = False
+        self.rho = []
+        with open(self.aFile, 'r') as f:
+            for line in f:
+                if switch == False:
+                    if 'rho  HALe' in line:
+                        switch = True
+                        rho = []
+                else:
+                    lineData = line.split(' ')
+                    if len(lineData) < 2.0:
+                        self.rho.append(np.array(rho))
+                        switch = False
+                    else:
+                        rho.append(float(lineData[0]))
+
+        return
+
+
+    def readRminor(self):
+        """
+        reads minor radius [m]
+        """
+        print("Reading Radius Profiles...")
+        switch = False
+        self.rMinor = [] #[m]
+        with open(self.aFile, 'r') as f:
+            for line in f:
+                if switch == False:
+                    if 'j      ti(ev)' in line:
+                        switch = True
+                        r = []
+                else:
+                    if '1 cycle' in line:
+                        self.rMinor.append(np.array(r))
+                        switch = False
+                    else:
+                        r.append(float(line[153:164]))
+
+        return
+
+    def readRadialTprofilesRho(self):
+        """
+        reads T [eV] profile as a function of normalized radial coordinate, rho
+        """
+        print("Reading Temperature Profiles...")
+        switch = False
+        self.Te = [] #[eV]
+        self.Ti = [] #[eV]
+        with open(self.aFile, 'r') as f:
+            for line in f:
+                if switch == False:
+                    if 'rho  Te' in line:
+                        switch = True
+                        Te = []
+                        Ti = []
+                else:
+                    lineData = line.split(' ')
+                    if len(lineData[0]) < 2.0:
+                        self.Te.append(np.array(Te))
+                        self.Ti.append(np.array(Ti))
+                        switch = False
+                    else:
+#                        Te.append(float(lineData[1]))
+#                        Ti.append(float(lineData[2]))
+                        Te.append(float(line[5:15]))
+                        Ti.append(float(line[15:25]))
+
+        return
+
+
+    def readRadialTprofiles(self):
+        """
+        reads T [eV] profiles as a function of radius [m] from axis to sep
+        """
+        print("Reading Temperature Profiles...")
+        switch = False
+        self.Te = [] #[eV]
+        self.Ti = [] #[eV]
+        with open(self.aFile, 'r') as f:
+            for line in f:
+                if switch == False:
+                    if 'j      ti(ev)' in line:
+                        switch = True
+                        Te = []
+                        Ti = []
+                else:
+#                    lineData = line.split(' ')
+#                    lineData = [x for x in lineData if x != '']
+                    if '1 cycle' in line:
+                        self.Te.append(np.array(Te))
+                        self.Ti.append(np.array(Ti))
+                        switch = False
+                    else:
+#                        Te.append(float(lineData[1]))
+#                        Ti.append(float(lineData[2]))
+                        Ti.append(float(line[6:17]))
+                        Te.append(float(line[18:29]))
+
+        return
+
+
+    def readRadialCurrentProfilesRho(self):
+        """
+        reads J [A/m^2] profile as a function of normalized radial coordinate, rho
+        """
+        print("Reading Current Profiles...")
+        switch = False
+        self.Jtot = [] #[A/m^2]
+        self.Jbs = [] #[A/m^2]
+        with open(self.aFile, 'r') as f:
+            for line in f:
+                if switch == False:
+                    if 'rho  HALe' in line:
+                        switch = True
+                        Jtot = []
+                        Jbs = []
+                else:
+                    lineData = line.split(' ')
+                    if len(lineData) < 2.0:
+                        self.Jtot.append(np.array(Jtot))
+                        self.Jbs.append(np.array(Jbs))
+                        switch = False
+                    else:
+                        Jtot.append(float(line[75:85]))
+                        Jbs.append(float(line[65:75]))
+        return
+
+
+    def readRadialCurrentProfiles(self):
+        """
+        reads J [A/m^2] profile as a function of radius [m] from axis to sep
+        """
+        print("Reading Current Profiles...")
+        switch = False
+        self.J = [] #[A/m^2]
+
+        with open(self.aFile, 'r') as f:
+            for line in f:
+                if switch == False:
+                    if 'j      ti(ev)' in line:
+                        switch = True
+                        J = []
+                else:
+#                    lineData = line.split(' ')
+#                    lineData = [x for x in lineData if x != '']
+                    if '1 cycle' in line:
+                        self.J.append(np.array(J))
+                        switch = False
+                    else:
+                        J.append(float(line[129:140]))
+
+        return
+
+
+    def readTimeSteps(self):
+        """
+        reads timesteps at which the profiles (and GEQDSKs?) are written
+        """
+        print("Reading Timesteps...")
+        self.ts = [] #[s]
+        cycles = []
+        with open(self.aFile, 'r') as f:
+            for line in f:
+                if '1 cycle' in line and 'Sawtooth' not in line:
+                    lineData = line.split(" ")
+                    lineData = [x for x in lineData if x != '']
+                    if lineData[2] not in cycles:
+                        cycles.append(lineData[2])
+                        self.ts.append(float(lineData[4]))
+
+        return
+
+
+    def readRadii(self):
+        """
+        reads major and minor radii at each write timestep
+        """
+        print("Reading Radii...")
+        switch = False
+        self.r0 = [] # major radius [m]
+        self.a = [] # minor radius [m]
+        with open(self.aFile, 'r') as f:
+            for line in f:
+                if switch == False:
+                    if 'r0        a' in line:
+                        switch = True
+                else:
+                    lineData = line.split(' ')
+                    lineData = [x for x in lineData if x != '']
+                    self.r0.append(float(lineData[0]))
+                    self.a.append(float(lineData[1]))
+                    switch = False
+
+        return

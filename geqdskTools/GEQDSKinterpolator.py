@@ -31,7 +31,7 @@ def factors(n):
         for factor in (i, n//i)
     ))
 #maximum allowable timestep size
-dtMax = 100
+dtMax = 25
 tsOrig = [int(x.replace('g000001.', '')) for x in gFileList]
 tMin = min(tsOrig)
 tMax = max(tsOrig)
@@ -62,8 +62,9 @@ ts = np.linspace(tMin, tMax, Nsteps+1)
 #===create interpolators for geqdsk
 MHD = MHDClass.setupForTerminalUse(gFile=[rootPath+x for x in gFileList])
 for i,t in enumerate(ts):
+
     #interpolate this timestep
-    ep = MHD.gFileInterpolate(ts[i])
+    ep = MHD.gFileInterpolate(t)
     #write file
     name = 'g000001.{:05d}'.format(int(t))
     f = outPath + name
