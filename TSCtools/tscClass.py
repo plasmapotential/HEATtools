@@ -1,5 +1,5 @@
 #tscClass.py
-#description:   class object for TSC output file IO.  used by other files
+#description:   class object for TSC output file IO
 #date:          Nov 2021
 #engineer:      T Looby
 import numpy as np
@@ -16,6 +16,8 @@ class tscIO:
     def readRhoProfile(self):
         """
         read radial coordinate rho.
+
+        generates rho, a list of arrays indexed to TSC write timesteps (self.ts)
         """
         print("Reading Rho Profiles...")
         switch = False
@@ -40,6 +42,8 @@ class tscIO:
     def readRminor(self):
         """
         reads minor radius [m]
+
+        generates rMinor, a list of arrays indexed to TSC write timesteps (self.ts)
         """
         print("Reading Radius Profiles...")
         switch = False
@@ -62,6 +66,8 @@ class tscIO:
     def readRadialTprofilesRho(self):
         """
         reads T [eV] profile as a function of normalized radial coordinate, rho
+
+        generates Te and Ti, lists of arrays indexed to TSC write timesteps (self.ts)
         """
         print("Reading Temperature Profiles...")
         switch = False
@@ -92,6 +98,8 @@ class tscIO:
     def readRadialTprofiles(self):
         """
         reads T [eV] profiles as a function of radius [m] from axis to sep
+
+        generates Te and Ti, lists of arrays indexed to TSC write timesteps (self.ts)
         """
         print("Reading Temperature Profiles...")
         switch = False
@@ -123,6 +131,11 @@ class tscIO:
     def readRadialCurrentProfilesRho(self):
         """
         reads J [A/m^2] profile as a function of normalized radial coordinate, rho
+
+        generates Jtot and Jabs, lists of arrays indexed to TSC write timesteps (self.ts)
+
+        Jtot is total current density
+        Jbs is bootstrap current density
         """
         print("Reading Current Profiles...")
         switch = False
@@ -150,6 +163,10 @@ class tscIO:
     def readRadialCurrentProfiles(self):
         """
         reads J [A/m^2] profile as a function of radius [m] from axis to sep
+
+        generates J, list of arrays indexed to TSC write timesteps (self.ts)
+
+        J is current density
         """
         print("Reading Current Profiles...")
         switch = False
@@ -176,6 +193,9 @@ class tscIO:
     def readTimeSteps(self):
         """
         reads timesteps at which the profiles (and GEQDSKs?) are written
+
+        can return an array that is a lesser length than the profiles because
+        some timesteps can be repeated in the profile data
         """
         print("Reading Timesteps...")
         self.ts = [] #[s]
@@ -195,6 +215,8 @@ class tscIO:
     def readRadii(self):
         """
         reads major and minor radii at each write timestep
+
+        generates r0 and a, lists of arrays indexed to TSC write timesteps (self.ts)
         """
         print("Reading Radii...")
         switch = False

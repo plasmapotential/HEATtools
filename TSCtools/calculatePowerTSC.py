@@ -44,20 +44,20 @@ rMinor = tsc.rMinor[idx]
 #Tnew = Tinterp(rhoNew)
 #Jnew = Jinterp(rhoNew)
 
-#calculate area of each current shell
+#calculate area of each current shell using simplified circular model (no elongation)
 A = []
 for i in range(len(J)-1):
     A.append( np.pi*(rMinor[i+1]**2 - rMinor[i]**2) )
 A = np.array(A)
 
-#calculate approximate Spitzer resistivity, assuming Coulomb logarithm = 17
+#calculate approximate Spitzer resistivity
+#should check to make sure i have the constant right...
 CoulLog = 17
 spitz = 0.53e-4 * CoulLog * T**(-3.0/2.0)
 #spitz = 2.8e-8 *(T*1e-3)**(-3.0/2.0)
 
 #ohms
 R = spitz[:-1] * 2*np.pi*tsc.r0[idx] / A
-#print(R)
 
 #ohms law
 P = (J[:-1]*A)**2 * R
@@ -71,4 +71,4 @@ print("Complete")
 profFile = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/J_8710ms.csv'
 arr = np.vstack([tsc.rMinor[idx], tsc.J[idx]]).T
 head = "rMinor[m],J[A/m^2]"
-np.savetxt(profFile, arr, delimiter=",", header=head)
+#np.savetxt(profFile, arr, delimiter=",", header=head)
