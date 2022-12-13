@@ -132,7 +132,7 @@ class tscIO:
         """
         reads J [A/m^2] profile as a function of normalized radial coordinate, rho
 
-        generates Jtot and Jabs, lists of arrays indexed to TSC write timesteps (self.ts)
+        generates Jtot and Jbs, lists of arrays indexed to TSC write timesteps (self.ts)
 
         Jtot is total current density
         Jbs is bootstrap current density
