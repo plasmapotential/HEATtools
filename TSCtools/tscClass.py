@@ -256,7 +256,7 @@ class tscIO:
                         switch1 = True
                 else:
                     lineData = line.split(' ')
-                    lineData = [x for x in lineData if x != '']
+                    lineData = [float(x) for x in lineData if x != '']
                     params1.append(lineData)
                     switch1 = False
 
@@ -265,7 +265,7 @@ class tscIO:
                         switch2 = True
                 else:
                     lineData = line.split(' ')
-                    lineData = [x for x in lineData if x != '']
+                    lineData = [float(x) for x in lineData if x != '']
                     params2.append(lineData)
                     switch2 = False
 
