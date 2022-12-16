@@ -38,7 +38,7 @@ loopV = -1.0 * np.diff(psiSeps) / np.diff(ts)
 
 print(psiSeps)
 print(ts)
-
+print(loopV)
 
 arr = np.vstack([ts[:-1], loopV]).T
 head = "time[s],loopV[V]"

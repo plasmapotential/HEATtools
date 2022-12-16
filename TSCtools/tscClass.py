@@ -235,3 +235,48 @@ class tscIO:
                     switch = False
 
         return
+
+    def readEQparams(self):
+        """
+        reads some of the EQ parameters at each timestep
+
+        generates lists of arrays indexed to TSC write timesteps (self.ts)
+        """
+        print("Reading EQ Parameters")
+        switch1 = False
+        switch2 = False
+
+        params1 = []
+        params2 = []
+
+        with open(self.aFile, 'r') as f:
+            for line in f:
+                if switch1 == False:
+                    if 'q1          qe' in line:
+                        switch1 = True
+                else:
+                    lineData = line.split(' ')
+                    lineData = [x for x in lineData if x != '']
+                    params1.append(lineData)
+                    switch1 = False
+
+                if switch2 == False:
+                    if '1  cyc...' in line:
+                        switch2 = True
+                else:
+                    lineData = line.split(' ')
+                    lineData = [x for x in lineData if x != '']
+                    params2.append(lineData)
+                    switch2 = False
+
+        allParams = np.hstack([np.array(params1), np.array(params2)])
+
+        keys = ['q1','qe','betapol','li/2','li(GA d  ef)','vol', 'uint', 'npsit',
+                '1 cyc...', 'time', 'dt', 'taue(ms)','i','j','tauekg','zmag(gzero)',
+                'ekin','pl cur', 'amach', 'xmag', 'beta', 'loop v', 'iplim']
+
+        self.EQdict = {}
+        for i,row in enumerate(allParams.T):
+            self.EQdict[keys[i]] = row
+
+        return
