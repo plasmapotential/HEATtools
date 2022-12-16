@@ -7,6 +7,7 @@ import numpy as np
 import sys
 import os
 import shutil
+import plotly.graph_objects as go
 
 EFITPath = '/home/tom/source'
 HEATPath = '/home/tom/source/HEAT/github/source'
