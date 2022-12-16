@@ -1,5 +1,5 @@
 #calculateLoopV.py
-#Description:   calculates loop voltage at a user defined flux surface using
+#Description:   calculates loop voltage at a seperatrix using
 #               a directory of GEQDSKs corresponding to time varying EQs
 #Date:          20221216
 #engineer:      T Looby
