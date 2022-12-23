@@ -3,6 +3,8 @@
 #date:          Nov 2021
 #engineer:      T Looby
 import numpy as np
+import plotly.graph_objects as go
+from plotly.validators.scatter.marker import SymbolValidator
 
 class tscIO:
     def __init__(self, aFile):
@@ -280,3 +282,76 @@ class tscIO:
             self.EQdict[keys[i]] = row
 
         return
+
+
+    def readCoilCurrents(self, N_groups = 20):
+        """
+        scrapes outputs and generates coil currents
+        """
+        print("Reading EQ Parameters")
+
+        readFlag = False
+
+        self.coilCurrents = []
+        self.coilVoltages = []
+        self.coilTimes = []
+
+        with open(self.aFile, 'r') as f:
+            for line in f:
+                if readFlag == True:
+                    #end of coil current section
+                    if idx > N_groups:
+                        readFlag = False
+                        if len(self.coilCurrents) == 0:
+                            self.coilCurrents = np.array(params)[:,1]
+                            self.coilVoltages = np.array(params)[:,3]
+                        else:
+                            self.coilCurrents = np.vstack((self.coilCurrents, np.array(params)[:,1]))
+                            self.coilVoltages = np.vstack((self.coilVoltages, np.array(params)[:,3]))
+
+                    else:
+                        lineData = line.split(' ')
+                        lineData = [float(x) for x in lineData if x != '']
+                        params.append(lineData)
+                        idx+=1
+
+
+                else:
+                    #beginning of coil current section
+                    if 'group   actual sum   prepro' in line:
+                        readFlag = True
+                        params = []
+                        idx = 0
+
+                if 'coil curr (ka)  at cycle=' in line:
+                    lineData = line.split(' ')
+                    lineData = [x for x in lineData if x != '']
+                    self.coilTimes.append(float(lineData[7]))
+
+
+
+
+        self.coilCurrents /= 1000.0 #in [MA]
+        return
+
+
+    def plotCoilCurrents(self, coilNames):
+        """
+        returns a plotly figure that can be plotted by running fig.show()
+
+        user calls with list of coilNames and it dynamically builds out arrays
+        """
+        fig = go.Figure()
+        symbols = SymbolValidator().values
+        for i,name in enumerate(coilNames):
+            fig.add_trace(go.Scatter(x=self.coilTimes, y=self.coilCurrents[:,i],
+                                     name=name, line={'width':4}, mode='markers+lines',
+                                     marker_symbol=i, marker_size=12))
+        fig.update_layout(
+            xaxis_title="[s]",
+            yaxis_title="[MA]",
+            font=dict(
+                size=26,
+                ),
+            )
+        return fig
