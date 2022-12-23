@@ -26,4 +26,10 @@ coilNames = [
 
 fig = tsc.plotCoilCurrents(coilNames)
 fig.show()
+
 #save csv
+outFile = 'coilCurrents.csv'
+coilNames = ['[s]','CS1', 'CS2', 'CS3', 'PF1', 'PF2', 'PF3', 'PF4', 'Div1', 'Div2']
+arr = np.column_stack((np.array(tsc.coilTimes), tsc.coilCurrents[:,:len(coilNames)]))
+head = ','.join(coilNames)
+np.savetxt(outFile, arr, delimiter=",", fmt='%.10f', header=head)
