@@ -19,7 +19,7 @@ import MHDClass
 
 
 #edit these
-rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/v2h01a/'
+rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/v2h01b/'
 #sweep7
 gFileList = [
             'geqdsk_0',
@@ -29,16 +29,12 @@ gFileList = [
             'geqdsk_4',
             'geqdsk_5',
             'geqdsk_6',
-            'geqdsk_7',
-            'geqdsk_8',
-            'geqdsk_9',
-            'geqdsk_10',
             ]
 
 
 wallFile = '/home/tom/work/CFS/GEQDSKs/v2y.csv'
 newSuffix = '_v2y_negPsi_negBt_negIp_negFpol'
-newPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/'
+newPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol_b/'
 
 shot = 1
 df = pd.read_csv(wallFile, names=['R','Z'])

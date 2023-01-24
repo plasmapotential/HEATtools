@@ -16,8 +16,8 @@ sys.path.append(HEATPath)
 import MHDClass
 
 #===inputs, paths, etc.
-rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/withTimesteps/'
-outPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/interpolated/'
+rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol_b/withTimesteps/'
+outPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol_b/interpolated/'
 #read all files with a prefix
 prefix = 'g000001'
 gFileList = sorted([f for f in os.listdir(rootPath) if (os.path.isfile(os.path.join(rootPath, f)) and prefix in f)])
@@ -32,16 +32,19 @@ def factors(n):
         for factor in (i, n//i)
     ))
 #maximum allowable timestep size
-dtMax = 25
+dtMax = 100
 tsOrig = [int(x.replace('g000001.', '')) for x in gFileList]
 tMin = min(tsOrig)
 tMax = max(tsOrig)
 #mode for determining timestep size, dt.  Can be manual or factor
 #in both cases rounds to nearest [ms]
-mode='factor'
+mode='manual'
 #define tMax manually
 if mode=='manual':
     dt = dtMax
+    #define these if you desire, otherwise they are calculated from timesteps
+    tMin = 8800
+    tMax = 31000
 #define tMax using Sweep Trajectory final timestep and common factors
 #inds the largest factor of the final timestep that is less than dtMax
 #dtMax

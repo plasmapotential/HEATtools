@@ -9,23 +9,29 @@ import pandas as pd
 from scipy.interpolate import interp1d, LinearNDInterpolator
 
 #input file with RZ coordinates of mesh grid centers in columns 0,1
-radFile = '/home/tom/source/dummyOutput/RZpower.csv'
+radFile = '/home/tom/work/CFS/projects/coreRadiation/P_RZ_core_1MWuniform.csv'
 #file for saving glyphs to visualize rays in paraview
 glyphFile = '/home/tom/source/dummyOutput/glyph.csv'
 #file for saving L matrix
 LmatFile = '/home/tom/source/dummyOutput/Lmatrix.csv'
 #point where we are calculating the flux
-ctr = np.array([1.657,0.0,-1.42]) #[m]
+ctr = np.array([1.31716, -0.341764, -0.84725]) #[m]
 #normal vector of the face on which we calculate flux
-norm = np.array([1.0, 0.0, 0.0])
+norm = np.array([-0.80425286,  0.20018329, -0.25068388])
 #another point on the face
-pt1 = np.array([1.657,0.02,-1.42])
+pt1 = np.array([1.31655, -0.34161, -0.84517])
+
+#test point
+#ctr = np.array([1.657,0.0,-1.42]) #[m]
+#norm = np.array([1.0, 0.0, 0.0])
+#pt1 = np.array([1.657,0.02,-1.42])
+
 #number of samples in alpha, ranges from (0,pi), polar angle
-Na = 5 #ranges from 0,pi
+Na = 10 #ranges from 0,pi
 #number of samples in beta, ranges from (0,pi), azimuthal angle
-Nb = 5 #ranges from 0,pi
+Nb = 10 #ranges from 0,pi
 #toroidal location of the RZ emission grid [degrees]
-phi = 0.0
+phi = -15.0
 
 #various objects that can be saved
 saveBinCtrRays = False #each bin ctr
@@ -34,9 +40,9 @@ saveLmatrix = True #save L matrix in ixj csv file
 
 
 #read 2D radiation R,Z,P file
-#PC2D = pd.read_csv(radFile, header=0, names=['R','Z','P']).values #convert to m
+PC2D = pd.read_csv(radFile, header=0, names=['R','Z','P']).values #convert to m
 #for testing, a user defined point
-PC2D = np.array([[3.0, -1.7], [2.0, -0.5], [3.0, -1.4]])
+#PC2D = np.array([[3.0, -1.7], [2.0, -0.5], [3.0, -1.4]])
 
 Ni = len(PC2D)
 Nj = Na*Nb
@@ -46,6 +52,7 @@ radXYZ  = np.zeros((Ni,3))
 radXYZ[:,0] = PC2D[:,0] * np.cos(np.radians(phi))
 radXYZ[:,1] = PC2D[:,0] * np.sin(np.radians(phi))
 radXYZ[:,2] = PC2D[:,1]
+P_RZ = PC2D[:,0]
 
 #build 2D interpolator
 #f_PC = LinearNDInterpolator(PC2D[:,0:2],PC2D[:,2], fill_value=0)
@@ -217,3 +224,5 @@ if saveSrcTgtRays == True:
 if saveLmatrix == True:
     np.savetxt(LmatFile, L, delimiter=',', fmt='%.10f')
     print("Saved L matrix to ixj CSV file")
+    #P = np.matmul(P_RZ, L)
+    #print(np.sum(P))
