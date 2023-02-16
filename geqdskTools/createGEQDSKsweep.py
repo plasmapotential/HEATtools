@@ -7,9 +7,12 @@ import numpy as np
 import sys
 import os
 import shutil
-
-EFITPath = '/home/tom/source'
-HEATPath = '/home/tom/source/HEAT/github/source'
+#rocinante
+#EFITPath = '/home/tom/source'
+#HEATPath = '/home/tom/source/HEAT/github/source'
+#CFS machine
+EFITPath = '/home/tlooby/source'
+HEATPath = '/home/tlooby/source/HEAT/github/source'
 sys.path.append(EFITPath)
 sys.path.append(HEATPath)
 import MHDClass
