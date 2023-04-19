@@ -7,8 +7,10 @@ import os
 import numpy as np
 
 #path where gfiles are read from and where we will save the batchFile.dat
-gPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/interpolated_25ms/'
-outPath = '/home/tom/HEATruns/SPARC/rampup_TSCvh01a/inputFiles/'
+#gPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/interpolated_25ms/'
+#outPath = '/home/tom/HEATruns/SPARC/rampup_TSCvh01a/inputFiles/'
+gPath = '/home/tlooby/HEATruns/SPARC/vscShadows/sparc/'
+outPath = '/home/tlooby/HEATruns/SPARC/vscShadows/otherData/'
 
 #read all files with a prefix
 prefix = 'g000001'
@@ -116,7 +118,7 @@ for i,g in enumerate(gFileList):
     writeInputFile(outFile, power[i])
 
     #append line to batchFile
-    line = 'sparc,rampup_TSCvh01a, '+g+', fullSlice.stp, PFCs.csv, '+name+', hfOpt:T\n'
+    line = 'sparc,vscShadowVDE, '+g+', vscShadows_160deg.step, PFCs.csv, SPARC_input.csv, hfOpt:psiN:bdotn\n'
     if i==0:
         with open(outPath + "batchFile.dat", "w") as myfile:
             myfile.write(line)
