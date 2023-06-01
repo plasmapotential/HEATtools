@@ -2,6 +2,7 @@ import sys
 import shutil
 import numpy as np
 import pandas as pd
+import os
 #set up python environment
 #dev machine
 EFITPath = '/home/tom/source'
@@ -19,22 +20,30 @@ import MHDClass
 
 
 #edit these
-rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/v2h01b/'
+#rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/v2h01b/'
+rootPath = '/home/tom/work/CFS/GEQDSKs/MEQ_20230501/originals/'
+
+#manually create list of files
 #sweep7
-gFileList = [
-            'geqdsk_0',
-            'geqdsk_1',
-            'geqdsk_2',
-            'geqdsk_3',
-            'geqdsk_4',
-            'geqdsk_5',
-            'geqdsk_6',
-            ]
+#gFileList = [
+#            'geqdsk_0',
+#            'geqdsk_1',
+#            'geqdsk_2',
+#            'geqdsk_3',
+#            'geqdsk_4',
+#            'geqdsk_5',
+#            'geqdsk_6',
+#            ]
+
+#read all files with a prefix
+prefix = 'sparc_'
+gFileList = sorted([f for f in os.listdir(rootPath) if (os.path.isfile(os.path.join(rootPath, f)) and prefix in f)])
 
 
-wallFile = '/home/tom/work/CFS/GEQDSKs/v2y.csv'
-newSuffix = '_v2y_negPsi_negBt_negIp_negFpol'
-newPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol_b/'
+
+wallFile = '/home/tom/work/CFS/RZcontours/v3b.csv'
+newSuffix = '_v3b_PsiOver2pi_negIp_negBt_negFpol'
+newPath = '/home/tom/work/CFS/GEQDSKs/MEQ_20230501/corrected/'
 
 shot = 1
 df = pd.read_csv(wallFile, names=['R','Z'])
@@ -49,10 +58,10 @@ for gFile in gFileList:
     MHD.ep.g['Nwall'] = len(df['R'].values)
     MHD.ep.g['wall'] = np.vstack([df['R'].values, df['Z'].values]).T
 
-    #flip psi
-    MHD.ep.g['psiRZ'] = -1.0*MHD.ep.g['psiRZ']
-    MHD.ep.g['psiSep'] = -1.0*MHD.ep.g['psiSep']
-    MHD.ep.g['psiAxis'] = -1.0*MHD.ep.g['psiAxis']
+    # psi / 2pi
+    MHD.ep.g['psiRZ'] =   1.0/(2*np.pi)*MHD.ep.g['psiRZ']
+    MHD.ep.g['psiSep'] =  1.0/(2*np.pi)*MHD.ep.g['psiSep']
+    MHD.ep.g['psiAxis'] = 1.0/(2*np.pi)*MHD.ep.g['psiAxis']
 
     #flip Ip
     MHD.ep.g['Ip'] *= -1.0
