@@ -10,6 +10,11 @@
 #2) run sweepInterpolator.py to interpolate GEQDSKs along SP trajectory
 #3) run makeGEQDSKimages.py to generate .pngs of each sweep step
 
+
+#for quadratic, you need to tune the height to match your intended deltaS
+#note that the sweep interpolator normalizes S in the gfile to S=0 here,
+#so your Smin can be 0
+
 import numpy as np
 import pandas as pd
 import sys
@@ -20,38 +25,48 @@ from scipy.interpolate import interp1d
 import plotly.graph_objects as go
 
 #csv outfile
-f = '/home/tom/source/dummyOutput/SPsweep.csv'
+f = '/home/tlooby/HEATruns/SPARC/sweepMEQ_T4/SPsweep.csv'
 
 #can be quadratic, triangle
-mode='triangle'
+mode='quadratic'
 
 #Strike point maximum velocity
-vMax = 0.5 #[m/s]
+vMax = 0.7 #[m/s]
 #SP turn around time
 turnTime = .08 #[s]
 #min / max S of sweep
-minS = 0.0 #[m]
-maxS = 0.076#[m] for T5 calcs
+#minS = 0.0 #[m]
+#maxS = 0.076#[m] for T5 calcs
 #maxS = 0.230 #[m] tune this to get your objective maxS with the triangle
 #maxS = 0.2575 #for quad with 230mm extent
-deltaS = maxS - minS
+#T4 v3b
+#actual
+#minS = 0.038
+#maxS = 0.22
+#minS = 1.6318
+#maxS = 1.8923
+#tuned
+minS = 0.0
+maxS = 0.20
 
+
+deltaS = maxS - minS
+print(deltaS)
 period = 2*deltaS/vMax
 freq = 1/period
+
 
 #calculate evenly spaced S coordinates as a function of time
 #step size in S
 dS = 0.001 #[m]
 N = int(2*deltaS / dS)
 midPt = int(N/2.0)
-print(period)
 t = np.linspace(0,period,N+1)
 dt = t[1]-t[0]
 tMid = t[midPt]
 S = np.zeros((len(t)))
 S[:midPt] = vMax * t[:midPt]
-S[midPt:] = -vMax * (t[midPt:]-t[midPt]) + maxS
-
+S[midPt:] = -vMax * (t[midPt:]-t[midPt]) + deltaS
 
 if mode=='quadratic':
     #add in quadratic turn
@@ -76,6 +91,7 @@ if mode=='quadratic':
     test = np.logical_and(t>(tMid-t1) ,t<(tMid+t1))
     use = np.where(test==True)[0]
     S[use] = -1.0 * alpha*(t[use]-tMid)**2 + c0 + S1
+
 
     #at t=period
     S1 = vMax * (period-t1)

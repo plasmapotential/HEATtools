@@ -5,7 +5,7 @@
 import os
 
 #path where gfiles are read from and where we will save the batchFile.dat
-rootPath = '/home/tom/work/CFS/GEQDSKs/TSCruns/TSC-V2h01/TSC-V2h01/corrected_v2y_Ip_Bt_psi_Fpol/interpolated_100ms/'
+rootPath = '/home/tlooby/HEATruns/SPARC/sweepMEQ_T4/interpolated/dt100us_sinusoid_10mm_100Hz/'
 
 #read all files with a prefix
 prefix = 'g000001'
@@ -15,7 +15,7 @@ input('Press any key to continue')
 for i,g in enumerate(gFileList):
     t = int(g.split('.')[1])
     #append line to batchFile
-    line = 'sparc,rampup_TSCvh01a, '+g+', fullSlice.stp, PFCs.csv, SPARC_input_{:05d}.csv, hfOpt:T\n'.format(t)
+    line = 'sparc, sweepMEQ_T4_20230915_nominal, '+g+', T4_20230915_nominal.step, PFCs_T4_20230915.csv, SPARC_input.csv, hfOpt:T\n'
     if i==0:
         with open(rootPath + "batchFile.dat", "w") as myfile:
             myfile.write(line)

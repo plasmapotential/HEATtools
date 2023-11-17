@@ -9,8 +9,8 @@ import shutil
 import scipy.interpolate as scinter
 from scipy.interpolate import interp1d
 
-rootPath = '/home/tom/work/CFS/GEQDSKs/'
-name = 'v2y.csv'
+rootPath = '/home/tlooby/HEATruns/SPARC/sweepMEQ_T4/'
+name = 'v3b.csv'
 f = rootPath + name
 
 # Calculate distance along curve/wall (also called S):

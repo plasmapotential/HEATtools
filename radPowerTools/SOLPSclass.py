@@ -162,20 +162,27 @@ class SOLPS_NC:
         return fig
 
 
-    def plotlyAllRadLines(self, data):
+    def plotlyAllRadLines(self, data, multiplier=None, colorBar=True, zMax=None):
         """
         plots all line radiation profiles superimposed on the grid as a heatmap
 
         returns a plotly go.Figure() object
+
+        multiplier scales the power
         """
         #add up all power for all species
         z = np.zeros((self.Ncells))
         for d in data:
             z += np.array(np.abs(d.flatten()), dtype=float)
 
+        if multiplier is not None:
+            z*=multiplier
+
         fig = go.Figure()
 
-        zMax = max(z)
+        if zMax == None:
+            zMax = max(z)
+        
         print("Maximum Power: {:f} [W]".format(zMax))
         print("Total power: {:f} []".format(np.sum(z)))
         zNorm = z / zMax
@@ -183,8 +190,8 @@ class SOLPS_NC:
         self.Prad_all = z
         self.Prad_max = zMax
         self.Prad_sum = np.sum(z)
-        norm = matplotlib.colors.Normalize(vmin=min(z), vmax=max(z), clip=True)
-        mapper = cm.ScalarMappable(norm=norm, cmap=cm.hot)
+        norm = matplotlib.colors.Normalize(vmin=min(z), vmax=zMax, clip=True)
+        mapper = cm.ScalarMappable(norm=norm, cmap=cm.plasma)
 
         #fig.add_trace(go.Scatter(x=self.xGrid,y=self.yGrid, fill="toself"))
         for i in range(self.Ncells):
@@ -194,14 +201,15 @@ class SOLPS_NC:
 
 
         #add colorbar
-        fig.add_trace(go.Scatter(x=[None],y=[None],mode='markers',
-                                 marker=dict(colorscale=plotly.colors.sequential.Hot,
-                                             cmin=0,cmax=zMax,
-                                             colorbar=dict(thickness=15,outlinewidth=0, title="Power [W]")
+        if colorBar == True:
+            fig.add_trace(go.Scatter(x=[None],y=[None],mode='markers',
+                                     marker=dict(colorscale=plotly.colors.sequential.Plasma,
+                                                 cmin=0,cmax=zMax,
+                                                 colorbar=dict(thickness=15,outlinewidth=0, title="Power [W]")
 
-                                            )
-                                 )
-                    )
+                                                )
+                                     )
+                        )
 
         fig.update_yaxes(scaleanchor = "x",scaleratio = 1,)
 
@@ -233,7 +241,7 @@ class SOLPS_NC:
 
         return fig
 
-    def addRZcontour(self, fig, contourFile):
+    def addRZcontour(self, fig, contourFile, scale=1.0):
         """
         adds an RZ contour to an existing figure
 
@@ -243,7 +251,7 @@ class SOLPS_NC:
         """
         RZ = np.genfromtxt(contourFile, comments='#', delimiter=',')
 
-        fig.add_trace(go.Scatter(x=RZ[:,0],y=RZ[:,1], mode='lines', line={'color':'blue'}))
+        fig.add_trace(go.Scatter(x=RZ[:,0]*scale,y=RZ[:,1]*scale, mode='lines', line={'color':'blue', 'width':6}))
 
 
         return fig
@@ -294,6 +302,7 @@ class SOLPS_NC:
         else:
             np.savetxt(file,data,delimiter=',',fmt='%.10f',header=head)
             print('Saved HEAT radiation file to: '+file)
+            print('Sum = {:f}'.format(np.sum(data[:,2])))
 
         return
 

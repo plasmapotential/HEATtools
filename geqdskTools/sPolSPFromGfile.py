@@ -10,26 +10,26 @@ import shutil
 import scipy.interpolate as scinter
 from scipy.interpolate import interp1d
 
-EFITPath = '/home/tom/source'
-HEATPath = '/home/tom/source/HEAT/github/source'
+EFITPath = '/home/tlooby/source'
+HEATPath = '/home/tlooby/source/HEAT/github/source'
 sys.path.append(EFITPath)
 sys.path.append(HEATPath)
 import MHDClass
 
-rootPath = '/home/tom/HEATruns/SPARC/sweep7_T5/originalGEQDSKs/'
+rootPath = '/home/tlooby/HEATruns/SPARC/sweepMEQ_T4/originalEQ/'
 
 #segments along divertor tile
 #T4
-#r0 = 1.578
-#r1 = 1.82
-#z0 = -1.303
-#z1 = -1.6
+r0 = 1.57
+r1 = 1.72
+z0 = -1.297
+z1 = -1.51
 
 #T5 bottom
-r0 = 1.72
-r1 = 1.84
-z0 = -1.575
-z1 = -1.575
+#r0 = 1.72
+#r1 = 1.84
+#z0 = -1.575
+#z1 = -1.575
 
 
 rMag = r1-r0

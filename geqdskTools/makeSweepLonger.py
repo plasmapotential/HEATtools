@@ -8,11 +8,16 @@ import os
 import numpy as np
 import shutil
 
-rootPath = '/home/tom/HEATruns/SPARC/sweep7_T4/S_interpolated_vSweep0.7_dt7ms_tri_10s/'
+rootPath = '/home/tlooby/HEATruns/SPARC/oscillation/interpolated/dt100us_sinusoid_1mm_50Hz/'
+#HEAT v3.X
+#v=3
+#HEAT v4.X
+v=4
+
 #number of times to duplicate
-N = 16
-dt = 7 #[ms]
-tMaxOrig = 651 #ms
+N = 5
+dt =  0.0001#[s]
+tMaxOrig =  0.02#[s]
 tMax = tMaxOrig
 #tMax = tMaxOrig - dt #if tMaxOrig=t0
 NstepsOrig = int(tMax / dt)
@@ -33,7 +38,10 @@ input('Press any key to continue')
 for j in range(N-1):
     for i in range(len(gFileList)):
         t = tMax*(j+1) + (i)*dt
-        newG = rootPath + 'g000001.{:05d}'.format(t)
+        if v==3:
+            newG = rootPath + 'g000001.{:05d}'.format(t)
+        else:
+            newG = rootPath + 'g000001_{:08f}'.format(t)
         oldG = rootPath + gFileList[i]
         shutil.copyfile(oldG,newG)
         print(newG)

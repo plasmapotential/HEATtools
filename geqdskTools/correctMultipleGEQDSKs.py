@@ -8,21 +8,24 @@ import sys
 import os
 import shutil
 
-EFITPath = '/home/tom/source'
-HEATPath = '/home/tom/source/HEAT/github/source'
+EFITPath = '/home/tlooby/source'
+HEATPath = '/home/tlooby/source/HEAT/github/source'
 sys.path.append(EFITPath)
 sys.path.append(HEATPath)
 import MHDClass
 
-rootPath = '/home/tom/HEATruns/SPARC/sweep7_T4/subsetOfSweep7/'
-#rootPath = '/home/tom/HEATruns/SPARC/sweep7/renamedFullSweep/'
-outPath = '/home/tom/HEATruns/SPARC/sweep7_T4/interpolatedGfiles/'
+rootPath = '/home/tlooby/projects/ILIM_EQ/originals/'
+outPath = '/home/tlooby/projects/ILIM_EQ/corrected/'
+
+#rootPath = '/home/tlooby/source/tomTest/dummyEQ/'
+#outPath = '/home/tlooby/source/tomTest/dummyEQ/'
+netcdfOut = False
 
 #expicitly define gFileList
-#gFileList = ['geqdsk_freegsu_run{:d}.geq_newWall_negPsi'.format(x) for x in np.arange(18)]
+#gFileList = ['geqdsk_freegsu_run{}.geq_newWall_negPsi'.format(x) for x in np.arange(18)]
 
 #read all files with a prefix
-prefix = 'geqdsk_freegsu_run'
+prefix = 'sparc_'
 gFileList = sorted([f for f in os.listdir(rootPath) if (os.path.isfile(os.path.join(rootPath, f)) and prefix in f)])
 
 print("GEQDSKs in this directory w/ prefix:")
@@ -30,14 +33,14 @@ print(gFileList)
 
 #multipliers for various parameters (these are also in HEAT GUI)
 #change these to flip sign of arrays they describe
-psiRZMult = 1.0
-psiSepMult = 1.0
-psiAxisMult = 1.0
+psiRZMult = 1.0 / (2*np.pi)
+psiSepMult = 1.0 / (2*np.pi)
+psiAxisMult = 1.0 / (2*np.pi)
 FpolMult = -1.0
 Bt0Mult = -1.0
 IpMult = -1.0
 
-newPrefix = outPath+'g000001.'
+newPrefix = outPath+'sparc_'
 
 for i,gf in enumerate(gFileList):
     try:
@@ -59,6 +62,12 @@ for i,gf in enumerate(gFileList):
     psiSep = ep.g['psiSep']
     psiAxis = ep.g['psiAxis']
     ep.g['psiRZn'] = (psi - psiAxis) / (psiSep - psiAxis)
-    MHD.writeGfile(newPrefix+'{:05d}'.format(i))
+    newName = gf + '_PsiOver2pi_negIp_negBt_negFpol'
+    if netcdfOut==True:
+        MHD.writeNetCDF(ep.g, outPath + newName + '.nc')
+        print(ep.g['q'])
+        print(len(ep.g['q']))
+    else:
+        MHD.writeGfile(outPath + newName)
 
-print("wrote all geqdsks")
+print("wrote all files")

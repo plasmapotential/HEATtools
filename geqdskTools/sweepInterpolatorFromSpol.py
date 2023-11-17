@@ -20,16 +20,22 @@ import plotly.graph_objects as go
 from functools import reduce
 
 #you need a valid HEAT install.  can be run in container
-EFITPath = '/home/tom/source'
-HEATPath = '/home/tom/source/HEAT/github/source'
+EFITPath = '/home/tlooby/source'
+HEATPath = '/home/tlooby/source/HEAT/github/source'
 sys.path.append(EFITPath)
 sys.path.append(HEATPath)
 import MHDClass
 
 #geqdsks in
-rootPath = '/home/tom/HEATruns/SPARC/sweep7_T5/originalGEQDSKs/'
+rootPath = '/home/tlooby/HEATruns/SPARC/oscillation/originalEQs/'
 #geqdsks out
-outPath = '/home/tom/HEATruns/SPARC/sweep7_T5/interpGEQDSK_T5_triangular_dt10ms_vSweep0.5ms/'
+outPath = '/home/tlooby/HEATruns/SPARC/oscillation/interpolated/dt100us_sinusoid_1mm_50Hz/'
+#Spol(t) profile, which should be 1 period
+Sfile = '/home/tlooby/HEATruns/SPARC/oscillation/SPsweep.csv'
+#timestep width
+dtMax = 0.0001 #[s]
+#number of periods to stitch
+Np = 1
 
 #segments along a divertor tile
 #v2a
@@ -43,10 +49,24 @@ outPath = '/home/tom/HEATruns/SPARC/sweep7_T5/interpGEQDSK_T5_triangular_dt10ms_
 #z0 = -1.3214
 #z1 = -1.6092
 #T5 bottom
-r0 = 1.72
-r1 = 1.84
-z0 = -1.575
-z1 = -1.575
+#r0 = 1.72
+#r1 = 1.84
+#z0 = -1.575
+#z1 = -1.575
+
+#v3b
+#T4
+#r0 = 1.57
+#r1 = 1.72
+#z0 = -1.297
+#z1 = -1.51
+
+#mid tile T4
+r0 = 1.6203
+r1 = 1.6707
+z0 = -1.3685
+z1 = -1.4378
+
 
 rMag = r1-r0
 zMag = np.abs(z1-z0)
@@ -60,7 +80,6 @@ def factors(n):
         for factor in (i, n//i)
     ))
 #read the Spol(t) profile, which should be 1 period
-Sfile = '/home/tom/source/dummyOutput/SPsweep.csv'
 S_csv = np.genfromtxt(Sfile, comments='#', delimiter=',')
 f_St = interp1d(S_csv[:,0], S_csv[:,1], kind='linear')
 #create inverse function, f_tS
@@ -70,20 +89,14 @@ f_tS = interp1d(S_csv[:tMidIdx,1], S_csv[:tMidIdx,0], kind='linear')
 
 
 #generate t and S using user inputs
-#timestep width
-dtMax = 0.001 #[s]
-#number of periods to stitch
-Np = 1
-
-
 #mode for determining timestep size, dt.  Can be manual or factor
-#in both cases rounds to nearest [ms]
 mode='manual'
 #define tMax manually
 if mode=='manual':
-    #tMax = 0.735 #[s] #quadratic
+    #tMax = 0.57 #[s] #quadratic
     #tMax = 0.651 #[s] #triangle
-    tMax = 0.3 #[s] #T5
+    #tMax = 0.3 #[s] #T5
+    tMax = np.round(S_csv[-1,0], 10) #[s]
     dt = dtMax
 #define tMax using Sweep Trajectory final timestep and common factors
 #inds the largest factor of the final timestep that is less than dtMax
@@ -99,8 +112,10 @@ else:
     else:
         dt = fact[use][-1] / 1000.0
 
-Nsteps = int(tMax / dt)
+Nsteps = int(np.round(tMax / dt))
 ts = np.linspace(0.0, Np*tMax, Nsteps+1)
+
+print(Nsteps)
 
 print("Found dt = {:f} [s]".format(dt))
 print(ts)
@@ -108,41 +123,58 @@ S = f_St(ts)
 
 #calculate S
 #step size
-dS = 0.001 #[m]
+dS = 0.0001 #[m]
 Ns = int(sMag / dS)
 
 r = np.linspace(r0,r1,Ns)
 z = np.linspace(z0,z1,Ns)
 S_rz = np.linspace(0,sMag,Ns)
 
+
 #read all files with a prefix and calculate S and t
 prefix = 'g000001'
 gFileList = sorted([f for f in os.listdir(rootPath) if (os.path.isfile(os.path.join(rootPath, f)) and prefix in f)])
 S_gFiles = []
 t_gFiles = []
+print(gFileList)
 for file in gFileList:
+    print(file)
     f = rootPath + file
     MHD = MHDClass.setupForTerminalUse(gFile=f)
     psi = MHD.ep.psiFunc.ev(r,z)
-    fS_g = interp1d(psi, S_rz, kind='linear')
-    S_gFiles.append(fS_g(1.0))
-
+    if np.min(psi) > 1.0:
+        print("skipping EQ: "+file)
+        print("min psi for skipped EQ: {:f}".format(np.min(psi)))
+    else:
+        fS_g = interp1d(psi, S_rz, kind='linear')
+        S_gFiles.append(fS_g(1.0))
 
 #now normalize S from Spol(t) profile so Spol(0)=min(S_gFiles)
-S += np.abs(S[0] - min(S_gFiles))
+#S += np.abs(S[0] - min(S_gFiles))
+#alternatively, change S so it is in middle of target
+S += (np.max(S_gFiles) - np.min(S_gFiles)) / 2.0 + np.min(S_gFiles)
+
 
 #create interpolators for geqdsk
 MHD = MHDClass.setupForTerminalUse(gFile=[rootPath+x for x in gFileList])
 MHD.Spols = S_gFiles
+ts += dt
+print(ts)
+input()
 for i,t in enumerate(ts):
     #interpolate this timestep
     print(S[i])
     ep = MHD.gFileInterpolateByS(S[i])
 
     #here we are changing sign of Ip for a specific use case (flipping helicity)
-    ep.g['Ip'] *= -1.0
+    #ep.g['Ip'] *= -1.0
 
     #write file
-    name = 'g000001.{:05d}'.format(int(t*1000.0))
+    #time = int(round(t*1000.0)) #offset timesteps by one dt so we dont start at 0 ms
+    #HEAT v4.0 convention
+    name = 'g000001_{:08f}'.format(t)
+    #HEAT v3.0 convention
+    #name = 'g000001_{:06d}'.format(i)
     f = outPath + name
-    MHD.writeGfile(f, shot=1, time=int(t*1000.0), ep=ep)
+    MHD.writeGfile(f, shot=1, time=t, ep=ep)
+

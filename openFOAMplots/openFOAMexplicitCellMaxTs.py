@@ -5,13 +5,13 @@ import os
 import numpy as np
 
 #name of each PFC
-pfc1 = '/home/tom/HEAT/data/sparc_000001_sweep7_axisymmetricT4_noEdge_1sQuad/openFoam/heatFoam/RevolveT4'
-pfc2 = '/home/tom/HEAT/data/sparc_000001_sweep7_axisymmetricT4_noEdge_1sTriangle/openFoam/heatFoam/RevolveT4'
+pfc1 = '/home/tom/HEAT/data/sparc_000001_impulseResponse/openFoam/heatFoam/T006'
+#pfc2 = '/home/tom/HEAT/data/sparc_000001_sweep7_axisymmetricT4_noEdge_1sTriangle/openFoam/heatFoam/RevolveT4'
+#files = [pfc1, pfc2]
+#nombres = ['Quadratic80ms', 'Triangle']
 
-files = [pfc1, pfc2]
-
-
-nombres = ['Quadratic80ms', 'Triangle']
+files = [pfc1]
+nombres = ['T']
 
 data = []
 maxTs = []
