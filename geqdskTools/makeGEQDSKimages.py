@@ -18,11 +18,11 @@ from scipy.interpolate import interp1d
 import plotly.graph_objects as go
 
 #rocinante
-#EFITPath = '/home/tom/source'
-#HEATPath = '/home/tom/source/HEAT/github/source'
+EFITPath = '/home/tom/source'
+HEATPath = '/home/tom/source/HEAT/github/source'
 #CFS machine
-EFITPath = '/home/tlooby/source'
-HEATPath = '/home/tlooby/source/HEAT/github/source'
+#EFITPath = '/home/tlooby/source'
+#HEATPath = '/home/tlooby/source/HEAT/github/source'
 
 sys.path.append(EFITPath)
 sys.path.append(HEATPath)
@@ -54,7 +54,7 @@ yBox = [-1.6, -1.2]
 #yBox = None
 
 #read all files with a prefix
-prefix = 'g000001'
+prefix = 'g000001.'
 gFileList = sorted([f for f in os.listdir(rootPath) if (os.path.isfile(os.path.join(rootPath, f)) and prefix in f)])
 
 for i,g in enumerate(gFileList):

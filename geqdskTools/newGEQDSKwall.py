@@ -2,6 +2,7 @@ import sys
 import shutil
 import numpy as np
 import pandas as pd
+import os
 #set up python environment
 #dev machine
 EFITPath = '/home/tlooby/source'
