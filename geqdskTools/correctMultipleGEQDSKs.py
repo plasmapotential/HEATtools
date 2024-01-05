@@ -14,8 +14,8 @@ sys.path.append(EFITPath)
 sys.path.append(HEATPath)
 import MHDClass
 
-rootPath = '/home/tlooby/projects/ILIM_EQ/originals/'
-outPath = '/home/tlooby/projects/ILIM_EQ/corrected/'
+rootPath = '/home/tlooby/projects/MEQ_EQ/originals/'
+outPath = '/home/tlooby/projects/MEQ_EQ/corrected/'
 
 #rootPath = '/home/tlooby/source/tomTest/dummyEQ/'
 #outPath = '/home/tlooby/source/tomTest/dummyEQ/'

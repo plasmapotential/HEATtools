@@ -22,6 +22,7 @@ SOLPS = SOLPSclass.SOLPS_IO()
 SOLPS.readGeometry(geomFile)
 SOLPS.readLineRadiation(radFile)
 SOLPS.readAtomRadiation(atomFile)
+SOLPS.readLineRadiation(radFile)
 radOut = '/home/tom/source/dummyOutput/RZ_SOLPS.csv'
 box=[1.5,1.8,-1.55,-1.25]
 SOLPS.createHEATradCSV(file=radOut, species='all', boundBox=box)

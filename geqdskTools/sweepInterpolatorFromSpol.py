@@ -27,11 +27,11 @@ sys.path.append(HEATPath)
 import MHDClass
 
 #geqdsks in
-rootPath = '/home/tlooby/HEATruns/SPARC/oscillation/originalEQs/'
+rootPath = '/home/tlooby/HEATruns/SPARC/oscillation_fixedSP/originalEQs/'
 #geqdsks out
-outPath = '/home/tlooby/HEATruns/SPARC/oscillation/interpolated/dt100us_sinusoid_1mm_50Hz/'
+outPath = '/home/tlooby/HEATruns/SPARC/oscillation_fixedSP/interpolated/dt100us_sinusoid_20mm_500Hz/'
 #Spol(t) profile, which should be 1 period
-Sfile = '/home/tlooby/HEATruns/SPARC/oscillation/SPsweep.csv'
+Sfile = '/home/tlooby/HEATruns/SPARC/oscillation_fixedSP/SPsweep.csv'
 #timestep width
 dtMax = 0.0001 #[s]
 #number of periods to stitch

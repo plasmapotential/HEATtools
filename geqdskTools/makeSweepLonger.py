@@ -8,7 +8,7 @@ import os
 import numpy as np
 import shutil
 
-rootPath = '/home/tlooby/HEATruns/SPARC/oscillation/interpolated/dt100us_sinusoid_1mm_50Hz/'
+rootPath = '/home/tlooby/HEATruns/SPARC/oscillation_fixedSP/interpolated/dt100us_sinusoid_20mm_500Hz/'
 #HEAT v3.X
 #v=3
 #HEAT v4.X
@@ -17,7 +17,7 @@ v=4
 #number of times to duplicate
 N = 5
 dt =  0.0001#[s]
-tMaxOrig =  0.02#[s]
+tMaxOrig =  0.002#[s]
 tMax = tMaxOrig
 #tMax = tMaxOrig - dt #if tMaxOrig=t0
 NstepsOrig = int(tMax / dt)
@@ -34,6 +34,7 @@ print(tsOrig)
 print("New timesteps")
 print(list(tsNew))
 print(len(gFileList))
+print(len(tsNew))
 input('Press any key to continue')
 for j in range(N-1):
     for i in range(len(gFileList)):

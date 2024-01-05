@@ -13,12 +13,12 @@ import plotly.graph_objects as go
 
 
 #csv outfile
-fOut = '/home/tlooby/HEATruns/SPARC/oscillation/SPsweep.csv'
+fOut = '/home/tlooby/HEATruns/SPARC/oscillation_fixedSP/SPsweep.csv'
 
 #amplitude [m]
-A = 0.001
+A = 0.02
 #sweep frequency [Hz]
-f = 50.0
+f = 500.0
 omega = 2*np.pi*f
 #calculate period
 period = 1.0/f

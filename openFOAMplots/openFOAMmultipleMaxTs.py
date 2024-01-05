@@ -8,7 +8,7 @@ import numpy as np
 #root = '/home/tom/HEAT/data/sparc_000001_sweep7/openFoam/heatFoam/'
 #root = '/home/tom/HEAT/data/sparc_000001_rampup_TSCvh01a_1mm_1lq/openFoam/heatFoam/'
 #root = '/media/tom/8f18dea0-fd98-4cd0-8dcf-0af04aad82c4/work/resultsCFS/TSC_rampup_dec2022/sparc_000001_rampup_TSCvh01a_ramped4MW_dt100ms/openFoam/heatFoam/'
-root = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_20230525_1_max_6.09MWlowerOuter_lq0.6mm_S0.6mm/openFoam/heatFoam/'
+root = '/home/tlooby/HEAT/data/sparc_000001_ILIM_NX_ellipse1mm_1782_lq0.9_S0.45_temperature/openFoam/heatFoam/'
 
 nombres = [f.name for f in os.scandir(root) if f.is_dir()]
 nombres.sort()
@@ -65,7 +65,7 @@ for i,df in enumerate(data):
     t = df[mask].sort_values('# Time')['# Time'].values
     varMax = df[mask].sort_values('# Time')['max'].values
     varMax = np.insert(varMax, 0, 300)
-    fig.add_trace(go.Scatter(x=t, y=varMax, name=nombres2[i], line=dict(width=2,),
+    fig.add_trace(go.Scatter(x=t-0.001, y=varMax, name=nombres[i], line=dict(width=2,),
                          mode='lines+markers', marker_size=10, marker_symbol=symbols[i], 
                          marker=dict(maxdisplayed=30)))
     
@@ -74,9 +74,9 @@ for i,df in enumerate(data):
 
 #temperature limits
 fig.add_trace(go.Scatter(
-    x=[-0.05, t[-1]+0.05],
-    y=[2273, 2273],
-    name="2000 degC",
+    x=[0.0, t[-1]+0.0005 - 0.001],
+    y=[1773, 1773],
+    name="1500 degC",
     mode="lines+markers",
     line=dict(color='firebrick', width=3, dash='dash'),
     marker_symbol='circle',
