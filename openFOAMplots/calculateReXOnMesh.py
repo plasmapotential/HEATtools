@@ -1,3 +1,7 @@
+#opens an openFOAM thermal analysis directory, takes the T and calculates the
+#recrystallization fraction [K], then saves result on the mesh to a 
+#new openfoam field, ReX, for each mesh element
+
 import os
 import csv
 import numpy as np
@@ -20,7 +24,7 @@ total_cells = 458031
 case_directory = '/home/tlooby/HEAT/data/sparc_000001_ILIM_NX_ellipse1mm_1782_lq0.9_S0.45_temperature/openFoam/heatFoam/T001'
 
 #output csv directory
-output_directory = case_directory + '/temperatures'
+output_directory = case_directory + '/ReX'
 
 # Get all time directories
 time_dirs = [d for d in os.listdir(case_directory) if d.replace('.', '', 1).isdigit()]
@@ -39,6 +43,39 @@ c2 = np.exp(E / (kB*T_ref))
 
 def calculateTrapz(Tprev, Tnew, dt):
     return dt * (np.exp(-E / (kB * Tprev)) + np.exp(-E / (kB * Tnew))) / 2
+
+# Function to write the OpenFOAM field file
+def write_field_file(time_dir, data, case_directory, field_name):
+    field_file_path = os.path.join(case_directory, time_dir, field_name)
+    with open(field_file_path, 'w') as file:
+        file.write('/*--------------------------------*- C++ -*----------------------------------*\\\n')
+        file.write('| =========                 |                                                 |\n')
+        file.write('| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |\n')
+        file.write('|  \\    /   O peration     | Version:  2112                                  |\n')
+        file.write('|   \\  /    A nd           | Website:  www.openfoam.com                      |\n')
+        file.write('|    \\/     M anipulation  |                                                 |\n')
+        file.write('\*---------------------------------------------------------------------------*/\n')
+        file.write("FoamFile\n")
+        file.write("{\n")
+        file.write("    version     2.0;\n")
+        file.write("    format      ascii;\n")
+        file.write("    arch        \"LSB;label=32;scalar=64\";\n")
+        file.write("    class       volScalarField;\n")
+        file.write("    location    "+time_dir+";\n")
+        file.write("    object      \""+field_name+"\";\n")
+        file.write("}\n")
+        file.write("// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //\n\n")
+        file.write("dimensions      [0 0 0 1 0 0 0];\n\n")
+        file.write("internalField   nonuniform List<scalar>\n")
+        file.write(f"{len(data)}\n(\n")
+        for value in data:
+            file.write(f"{value}\n")
+        file.write(")\n;\n")
+        file.write("boundaryField\n{\n    type calculated;\n}\n")
+        file.write("    }\n")
+        file.write("}\n\n\n")
+        file.write("// ************************************************************************* //\n")
+
 
 # Loop through each time directory
 for i,time_dir in enumerate(time_dirs):
@@ -70,7 +107,14 @@ for i,time_dir in enumerate(time_dirs):
                 
 
         prev_temp = current_temp
+
+        #write a csv file
         np.savetxt(csv_file_path, ReXData)
+
+        # Write the field file for this timestep
+        field_name = "ReX"
+        write_field_file(time_dir, ReXData, case_directory, field_name)
+
 
         print("Wrote timestep: "+time_dir)
 
