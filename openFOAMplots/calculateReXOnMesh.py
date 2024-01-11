@@ -11,17 +11,22 @@ from PyFoam.RunDictionary.TimeDirectory import TimeDirectory
 from PyFoam.RunDictionary.ParsedBlockMeshDict import ParsedBlockMeshDict
 
 # Constants (replace with actual values)
-E = 3.0  # Activation energy in [eV/atom]
+#E = 3.0  # Activation energy in [eV/atom]
+#k0 = 1553034867.0328593 #Avrami coefficient
+#n = 2.0 #Avrami exponent
+
+k0 = 4446601449.779298
+E = 3.0
+n = 1.0
+
 kB = 8.617333e-5 #eV/K
-k0 = 1553034867.0328593 #Avrami coefficient
-n = 2.0 #Avrami exponent
-T_ref = 1473 #[K] reference temperature
+T_ref = 1200 + 273.15 #[K] reference temperature
 # Total number of cells in the mesh (this needs to be set correctly)
-total_cells = 458031
+total_cells = 69801
 
 
 # OF case directory
-case_directory = '/home/tlooby/HEAT/data/sparc_000001_ILIM_NX_ellipse1mm_1782_lq0.9_S0.45_temperature/openFoam/heatFoam/T001'
+case_directory = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_20231206_nominal_fRadDiv70_lq0.6_S0.6/openFoam/heatFoam/T032'
 
 #output csv directory
 output_directory = case_directory + '/ReX'
@@ -32,9 +37,11 @@ time_dirs.sort(key=float)  # Sorting numerically
 
 integralData = np.zeros((total_cells))
 ReXData = np.zeros((total_cells))
+ReXDataPeak = 0
 
 # Previous timestep temperature for trapezoidal integration
 prev_temp = None
+prev_temp_max = None
 
 
 c1 = np.exp(-E / (kB*T_ref))
@@ -42,7 +49,7 @@ c2 = np.exp(E / (kB*T_ref))
 
 
 def calculateTrapz(Tprev, Tnew, dt):
-    return dt * (np.exp(-E / (kB * Tprev)) + np.exp(-E / (kB * Tnew))) / 2
+    return dt * ( np.exp(-E / (kB * Tprev)) + np.exp(-E / (kB * Tnew)) ) / 2.0
 
 # Function to write the OpenFOAM field file
 def write_field_file(time_dir, data, case_directory, field_name):
@@ -76,7 +83,7 @@ def write_field_file(time_dir, data, case_directory, field_name):
         file.write("}\n\n\n")
         file.write("// ************************************************************************* //\n")
 
-
+Tdata = []
 # Loop through each time directory
 for i,time_dir in enumerate(time_dirs):
     # Path to the temperature file for this timestep
@@ -86,7 +93,7 @@ for i,time_dir in enumerate(time_dirs):
     if os.path.isfile(temp_file_path):
         # Read the temperature field data
         temp_data = ParsedParameterFile(temp_file_path)
-        csv_file_path = os.path.join(output_directory, f"integral_{time_dir}.csv")
+        #csv_file_path = os.path.join(output_directory, f"integral_{time_dir}.csv")
 
         # Determine current temperature data
         if temp_data.content['internalField'].isUniform() == True:
@@ -95,28 +102,37 @@ for i,time_dir in enumerate(time_dirs):
         else:
             current_temp = np.array(temp_data.content['internalField'])
 
+        current_temp_max = np.max(current_temp)
+        Tdata.append(current_temp_max)
+
         # Calculate timestep (assuming uniform timestep)
         # Adjust this if you have variable timesteps
         if i > 0:
             delta_t = float(time_dirs[i]) - float(time_dirs[i - 1])
+            dt_hrs = delta_t / 3600.0
 
             # Trapezoidal integration
             if prev_temp is not None:
-                c3 = calculateTrapz(prev_temp, current_temp, delta_t)
+                c3 = calculateTrapz(prev_temp, current_temp, dt_hrs)
                 ReXData += 1 - np.exp(-k0*c1 * (c2 * c3)**n )
+                c3Peak = calculateTrapz(prev_temp_max, current_temp_max, dt_hrs)
+                ReXDataPeak += 1 - np.exp(-k0*c1 * (c2 * c3Peak)**n )
                 
 
         prev_temp = current_temp
+        prev_temp_max = current_temp_max
 
         #write a csv file
-        np.savetxt(csv_file_path, ReXData)
+        #np.savetxt(csv_file_path, ReXData)
 
         # Write the field file for this timestep
         field_name = "ReX"
         write_field_file(time_dir, ReXData, case_directory, field_name)
 
 
-        print("Wrote timestep: "+time_dir)
+        print("Wrote timestep: "+time_dir+"   Max Mesh ReX: {:f}   ReX Peak: {:f}".format(max(ReXData), ReXDataPeak))
 
     else:
         print(f"Temperature file not found for time {time_dir}")
+
+    np.savetxt(case_directory + '/TpeakCell_fromReXcalc.csv', np.array(Tdata), delimiter=',')
