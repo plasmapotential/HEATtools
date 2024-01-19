@@ -9,12 +9,6 @@ import pandas as pd
 import plotly.graph_objects as go
 import sys
 import os
-HEATPath = '/home/tlooby/source/HEAT/github/source'
-sys.path.append(HEATPath)
-import toolsClass
-tools = toolsClass.tools()
-tools.rootDir = HEATPath
-
 #================== USER INPUTS ======================================
 #Choose between 'poloidal' or 'toroidal' chord
 mode = 'poloidal'
@@ -57,11 +51,21 @@ threshDist = 1.0 #mm
 
 #use this to flip plot around (right=>left starting point)
 flip = True
+
 #use this to plot all the points in a plane as projected
 pointsInPlane = False
+
 #use this to create a VTK object with points used in plot (for viewing in paraview)
+#you will need to point it to the pvpython command on your machine (or in HEAT container)
 vtk = False
-pcfile = '/home/tom/source/test/'+mode+'.csv' #location where we save .vtk pointcloud file
+if vtk == True:
+    pcfile = '/home/tom/source/test/'+mode+'.csv' #location where we save .vtk pointcloud file
+    pvpythonCMD = '/opt/paraview/ParaView-5.9.0-RC2-MPI-Linux-Python3.8-64bit/bin/pvpython'
+    HEATPath = '/home/tlooby/source/HEAT/github/source'
+    sys.path.append(HEATPath)
+    import toolsClass
+    tools = toolsClass.tools()
+    tools.rootDir = HEATPath
 
 #min and max x axis values for plot
 sMin = -2
@@ -223,7 +227,6 @@ if vtk == True:
     pc[:,3] = np.ones((len(x)))
     head = "X,Y,Z,1"
     np.savetxt(pcfile, pc, delimiter=',',fmt='%.10f', header=head)
-    pvpythonCMD = '/opt/paraview/ParaView-5.9.0-RC2-MPI-Linux-Python3.8-64bit/bin/pvpython'
     os.environ["pvpythonCMD"] = pvpythonCMD
     tools.createVTKOutput(pcfile, 'points', 'toroidalChord')
 
