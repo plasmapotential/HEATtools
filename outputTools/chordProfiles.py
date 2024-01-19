@@ -61,6 +61,7 @@ flip = True
 pointsInPlane = False
 #use this to create a VTK object with points used in plot (for viewing in paraview)
 vtk = False
+pcfile = '/home/tom/source/test/'+mode+'.csv' #location where we save .vtk pointcloud file
 
 #min and max x axis values for plot
 sMin = -2
@@ -215,7 +216,6 @@ loc0 = np.argmin(np.linalg.norm(xyzOrdered - pt0, axis=1))
 #use this to create a VTK object with points used in plot
 if vtk == True:
     #make pointcloud of x and y for viewing in PV
-    pcfile = '/home/tom/source/test/'+mode+'.csv'
     pc = np.zeros((len(x), 4))
     pc[:,0] = x
     pc[:,1] = y
