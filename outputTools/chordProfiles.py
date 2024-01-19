@@ -1,5 +1,4 @@
 #plots HF from csv file along a slice, ie the s direction
-#you either need to have a HEAT installation, or run this in a docker container
 #uses plotly to plot (you will need to install for plots)
 #T. Looby
 #original: 2021.  updated jan 2024
