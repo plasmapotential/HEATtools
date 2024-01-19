@@ -25,7 +25,7 @@ from stl import mesh
 rootPath = '/home/tlooby/HEATruns/SPARC/ILIM_shaping/EQ/limiterAdjust/'
 outPath = '/home/tlooby/HEATruns/SPARC/ILIM_shaping/EQ/limiterAdjust/'
 
-stlFile = '/home/tlooby/HEAT/data/SPARC/STLs/T001___1.000000mm.stl'
+stlFile = '/home/tlooby/HEAT/data/SPARC/STLs/T008___1.000000mm.stl'
 
 #read all files with a prefix
 prefix = 'sparc_'

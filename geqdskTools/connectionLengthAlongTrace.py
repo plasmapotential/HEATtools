@@ -2,9 +2,19 @@
 
 import numpy as np
 
-f = '/home/tom/HEAT/data/sparc_000001/0.000000000/trace2.dat'
+f = '/home/tlooby/HEAT/data/sparc_000001/0.100000000/struct_pt005.csv'
+#index where we want to stop this trace, None if we want entire trace
+idxStop = 2414
+#direction of trace (this will be opposite what is set in HEAT trace file)
+traceDir = -1 #
+if idxStop != None:
+    if traceDir == 1:
+        trace = np.genfromtxt(f, delimiter=',', comments='#')[:idxStop]
+    else:
+        trace = np.genfromtxt(f, delimiter=',', comments='#')[idxStop:]
+else:
+    trace = np.genfromtxt(f, delimiter=',', comments='#')
 
-trace = np.genfromtxt(f, delimiter=',', comments='#')
 
 def distance(traceData:np.ndarray):
     """
@@ -21,3 +31,5 @@ print(trace[0])
 print(trace[-1])
 print(d[0])
 print(d[-1])
+print("Average Step Size: {:f}".format(np.average(np.diff(d))))
+print(d[-1] + np.average(np.diff(d)))
