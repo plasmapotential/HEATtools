@@ -8,16 +8,19 @@ import os
 import numpy as np
 import shutil
 
-rootPath = '/home/tlooby/HEATruns/SPARC/oscillation_fixedSP/interpolated/dt100us_sinusoid_20mm_500Hz/'
+rootPath = '/home/tlooby/HEATruns/SPARC/oscillation_sweep/EQs/interpolated/dt500us_sinusoid_20mm_100Hz/0.5s_sweep/'
 #HEAT v3.X
 #v=3
 #HEAT v4.X
 v=4
 
+#If you are pasting 1 period of gfiles in here, you need to remove the last gfile 
+#if it is the same eq as the first gfile.  gfiles should start at 0ms
+
 #number of times to duplicate
-N = 5
-dt =  0.0001#[s]
-tMaxOrig =  0.002#[s]
+N = 50
+dt =  0.0005#[s]
+tMaxOrig =  0.01#[s]
 tMax = tMaxOrig
 #tMax = tMaxOrig - dt #if tMaxOrig=t0
 NstepsOrig = int(tMax / dt)
@@ -34,8 +37,10 @@ print(tsOrig)
 print("New timesteps")
 print(list(tsNew))
 print(len(gFileList))
+
 print(len(tsNew))
 input('Press any key to continue')
+
 for j in range(N-1):
     for i in range(len(gFileList)):
         t = tMax*(j+1) + (i)*dt
@@ -44,6 +49,9 @@ for j in range(N-1):
         else:
             newG = rootPath + 'g000001_{:08f}'.format(t)
         oldG = rootPath + gFileList[i]
+
         shutil.copyfile(oldG,newG)
+        #print(oldG)
         print(newG)
+        #input()
 print("Sweep extension completed")

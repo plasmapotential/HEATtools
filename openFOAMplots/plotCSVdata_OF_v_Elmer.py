@@ -5,9 +5,9 @@ import pandas as pd
 import os
 import numpy as np
 
-f1 = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_stress/IDEA_run/elmerOutput.csv'
-f4 = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_20230525_1_max_6.09MWlowerOuter_lq0.6mm_S0.6mm/openFoam/heatFoam/A_objects087/postProcessing/fieldMinMax1/0/fieldMinMax.dat'
-
+#f1 = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_stress/IDEA_run/elmerOutput.csv'
+f1 = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_stressReX_lq0.6_S0.6_fRadDiv70/elmer_T0_293K/elmerData.csv'
+f4 = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_stressReX_lq0.6_S0.6_fRadDiv70/elmer_T0_293K/fieldMinMax_OF20230525_lq0.6_S0.6_fRadDiv70_middleT4.dat'
 data1 = pd.read_csv(f1)
 
 
@@ -43,9 +43,10 @@ fig.add_trace(go.Scatter(x=t[tUse], y=varMax[tUse] - 273.15, name='openFOAM', li
                      marker=dict(maxdisplayed=200)))
 
 #Elmer FEM data
-fig.add_trace(go.Scatter(x=data1['Time'][:-1]*0.005+0.005, y=data1['max(temperature)'], name='Elmer', line=dict(width=2,),
+fig.add_trace(go.Scatter(x=data1['Time'][:-1]*0.005+0.005, y=data1['max(temperature)']-273.15, name='Elmer', line=dict(width=2,),
                      mode='lines+markers', marker_size=10, marker_symbol=symbols[1], 
                      marker=dict(maxdisplayed=30)))
+
 
 
 

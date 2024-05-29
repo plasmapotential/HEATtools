@@ -1,5 +1,5 @@
 #SpolOfSweep.py
-#Description:   Calculates Spol of strike point for 1 period given the maximum
+#Description:   Calculates Spol of strike point for 1 oscillation period given the maximum
 #               strike point velocity.  Uses quadratic turns with user defined
 #               turn around time
 #Date:          20220831

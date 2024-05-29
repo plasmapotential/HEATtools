@@ -25,11 +25,11 @@ from stl import mesh
 rootPath = '/home/tlooby/HEATruns/SPARC/ILIM_shaping/EQ/limiterAdjust/'
 outPath = '/home/tlooby/HEATruns/SPARC/ILIM_shaping/EQ/limiterAdjust/'
 
-stlFile = '/home/tlooby/HEAT/data/SPARC/STLs/T008___1.000000mm.stl'
+stlFile = '/home/tlooby/HEAT/data/SPARC/STLs/Compound___10.000000mm.stl'
 
 #read all files with a prefix
 prefix = 'sparc_'
-suffix = '_movedLCFS'
+suffix = '_movedLCFS_2.5mmOffset'
 gFileList = sorted([f for f in os.listdir(rootPath) if (os.path.isfile(os.path.join(rootPath, f)) and prefix in f and suffix not in f)])
 
 print("GEQDSKs in this directory w/ prefix:")

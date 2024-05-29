@@ -13,19 +13,21 @@ import plotly.graph_objects as go
 
 
 #csv outfile
-fOut = '/home/tlooby/HEATruns/SPARC/oscillation_fixedSP/SPsweep.csv'
+fOut = '/home/tlooby/HEATruns/SPARC/oscillation_sweep/EQs/SPsweep_20mm_100Hz_shiftPiover4.csv'
 
 #amplitude [m]
 A = 0.02
 #sweep frequency [Hz]
-f = 500.0
+f = 100.0
+#phase shift
+phase = np.pi / 4.0
 omega = 2*np.pi*f
 #calculate period
 period = 1.0/f
 #create time basis
 t = np.linspace(0,period, 1000)
 
-S = A*np.sin(omega*t)
+S = A*np.sin(omega*t + phase)
 
 
 fig = go.Figure()

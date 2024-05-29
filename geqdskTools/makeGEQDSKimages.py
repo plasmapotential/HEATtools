@@ -18,11 +18,11 @@ from scipy.interpolate import interp1d
 import plotly.graph_objects as go
 
 #rocinante
-EFITPath = '/home/tom/source'
-HEATPath = '/home/tom/source/HEAT/github/source'
+#EFITPath = '/home/tom/source'
+#HEATPath = '/home/tom/source/HEAT/github/source'
 #CFS machine
-#EFITPath = '/home/tlooby/source'
-#HEATPath = '/home/tlooby/source/HEAT/github/source'
+EFITPath = '/home/tlooby/source'
+HEATPath = '/home/tlooby/source/HEAT/github/source'
 
 sys.path.append(EFITPath)
 sys.path.append(HEATPath)
@@ -43,24 +43,36 @@ import GUIscripts.plotly2DEQ as pEQ
 #rootPath = '/home/tlooby/source/sparc_Forced_VDE/output/'
 #rootPath = '/home/tlooby/source/tomTest/dummyEQ/'
 #outPath = '/home/tlooby/source/tomTest/dummyEQ/'
-rootPath = '/home/tlooby/HEATruns/SPARC/oscillation/interpolated/dt1ms_sinusoid_1mm_100Hz/'
-outPath = '/home/tlooby/HEATruns/SPARC/oscillation/EQplots/'
+#rootPath = '/home/tlooby/HEATruns/SPARC/IOLIM_shaping/EQ/VDE_downIn_timesteps/'
+#outPath =  '/home/tlooby/HEATruns/SPARC/IOLIM_shaping/EQ/VDE_downIn_timesteps/EQplots/'
+#rootPath = '/home/tlooby/HEATruns/SPARC/oscillation_sweep/EQs/interpolated/dt1ms_sinusoid_20mm_100Hz/'
+#outPath =  '/home/tlooby/HEATruns/SPARC/oscillation_sweep/EQs/interpolated/dt1ms_sinusoid_20mm_100Hz/EQplots/'
+rootPath = '/home/tlooby/HEATruns/SPARC/IOLIM_shaping/sparc/'
+outPath =  '/home/tlooby/results/IOLIM_shaping/VDE_1353v2/S1/'
+
 
 #height in pixels
-h = 1300
-xBox = [1.55, 1.75]
-yBox = [-1.6, -1.2]
+h = 790
+xBox = [1.0, 2.6]
+yBox = [-1.4, 1.4]
 #xBox = None
 #yBox = None
 
 #read all files with a prefix
-prefix = 'g000001.'
+prefix = 'sparcVDE1353v2'
 gFileList = sorted([f for f in os.listdir(rootPath) if (os.path.isfile(os.path.join(rootPath, f)) and prefix in f)])
 
 for i,g in enumerate(gFileList):
-    f = rootPath+g
-    MHD = MHDClass.setupForTerminalUse(gFile=f)
-    ep = MHD.ep
+    try:
+        f = rootPath+g
+        MHD = MHDClass.setupForTerminalUse(gFile=f)
+        ep = MHD.ep
+    except: #EFIT reader is very specific about shot names
+        newf = rootPath+'g000001.00001'
+        shutil.copyfile(f, newf)
+        MHD = MHDClass.setupForTerminalUse(gFile=newf)
+        ep = MHD.ep
+
     fig = pEQ.makePlotlyEQDiv(1, ep.g['time'], 'sparc', ep, height=h, gfile=None, logFile=False,
                                 bg='#252625', xRange=xBox, yRange=yBox)
 
@@ -116,11 +128,13 @@ for i,g in enumerate(gFileList):
 
     #for printing q95
     #fig.update_layout(title="t={:0.1f} [ms]; q95 = {:0.3f}".format(ep.g['time']/10.0, q95))
-    #fig.update_layout(title="t={:0.1f} [ms]".format(ep.g['time']))
-    fig.update_layout(font=dict(size=40), margin=dict(l=10,r=10,b=10,t=100))
+    fig.update_layout(title="t={:0.6f} [s]".format(ep.g['time']))
+    #fig.update_layout(title="{:05d}".format(i))
+    fig.update_layout(font=dict(size=24), margin=dict(l=10,r=10,b=10,t=100))
     #for no title
-    fig.update_layout(title=None)
-#    fig.update_layout(font=dict(size=40), margin=dict(l=10,r=10,b=50,t=100))
+#    fig.update_layout(title=None)
+    #for a title
+    fig.update_layout(font=dict(size=24), margin=dict(l=10,r=10,b=50,t=100))
     #for timestep in name
     #fig.write_image(outPath+'{:05d}.png'.format(ep.g['time']))
     #for index in name
@@ -128,4 +142,4 @@ for i,g in enumerate(gFileList):
 
 
 
-    print("wrote image: {:05d}.png".format(ep.g['time']))
+    print("wrote image: {:f}.png".format(ep.g['time']))

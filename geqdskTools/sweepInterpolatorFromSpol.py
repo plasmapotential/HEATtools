@@ -1,4 +1,4 @@
-#sweepInterpolator.py
+#sweepInterpolatorFromSpol.py
 #Description:   Uses a Spol(t) profile from csv file, and existing GEQDSKs, to
 #               stitch together a SP sweep at user specified dt
 #Date:          20220831
@@ -27,13 +27,13 @@ sys.path.append(HEATPath)
 import MHDClass
 
 #geqdsks in
-rootPath = '/home/tlooby/HEATruns/SPARC/oscillation_fixedSP/originalEQs/'
+rootPath = '/home/tlooby/HEATruns/SPARC/oscillation_sweep/EQs/originalEQs/'
 #geqdsks out
-outPath = '/home/tlooby/HEATruns/SPARC/oscillation_fixedSP/interpolated/dt100us_sinusoid_20mm_500Hz/'
+outPath = '/home/tlooby/HEATruns/SPARC/oscillation_sweep/EQs/interpolated/dt10ms_oneDir_400mmPerSec_150mm/'
 #Spol(t) profile, which should be 1 period
-Sfile = '/home/tlooby/HEATruns/SPARC/oscillation_fixedSP/SPsweep.csv'
+Sfile = '/home/tlooby/HEATruns/SPARC/oscillation_sweep/EQs/SPsweep_oneDir_400mmPerSec.csv'
 #timestep width
-dtMax = 0.0001 #[s]
+dtMax = 0.01 #[s]
 #number of periods to stitch
 Np = 1
 
@@ -56,16 +56,18 @@ Np = 1
 
 #v3b
 #T4
-#r0 = 1.57
-#r1 = 1.72
-#z0 = -1.297
-#z1 = -1.51
+r0 = 1.57
+r1 = 1.72
+z0 = -1.297
+z1 = -1.51
+#S_midT4 = 1.762
 
 #mid tile T4
-r0 = 1.6203
-r1 = 1.6707
-z0 = -1.3685
-z1 = -1.4378
+#r0 = 1.6203
+#r1 = 1.6707
+#z0 = -1.3685
+#z1 = -1.4378
+
 
 
 rMag = r1-r0
@@ -81,7 +83,10 @@ def factors(n):
     ))
 #read the Spol(t) profile, which should be 1 period
 S_csv = np.genfromtxt(Sfile, comments='#', delimiter=',')
-f_St = interp1d(S_csv[:,0], S_csv[:,1], kind='linear')
+#use this for periodic cases
+#f_St = interp1d(S_csv[:,0], S_csv[:,1], kind='linear')
+#use this if you have a linear sweep and you are running into bound errors
+f_St = interp1d(S_csv[:,0], S_csv[:,1], kind='linear', bounds_error=False, fill_value='extrapolate')
 #create inverse function, f_tS
 tMidIdx = np.argmax(S_csv[:,1])
 #create monotonic function for inverse interpolation
@@ -99,7 +104,7 @@ if mode=='manual':
     tMax = np.round(S_csv[-1,0], 10) #[s]
     dt = dtMax
 #define tMax using Sweep Trajectory final timestep and common factors
-#inds the largest factor of the final timestep that is less than dtMax
+#finds the largest factor of the final timestep that is less than dtMax
 #dtMax
 else:
     tMax = np.round(S_csv[-1,0], 3)
@@ -113,12 +118,9 @@ else:
         dt = fact[use][-1] / 1000.0
 
 Nsteps = int(np.round(tMax / dt))
+tMax = Nsteps * dt
 ts = np.linspace(0.0, Np*tMax, Nsteps+1)
-
-print(Nsteps)
-
 print("Found dt = {:f} [s]".format(dt))
-print(ts)
 S = f_St(ts)
 
 #calculate S
@@ -148,17 +150,25 @@ for file in gFileList:
     else:
         fS_g = interp1d(psi, S_rz, kind='linear')
         S_gFiles.append(fS_g(1.0))
+        print(fS_g(1.0))
 
 #now normalize S from Spol(t) profile so Spol(0)=min(S_gFiles)
+#=== FOR PERIODIC S:
 #S += np.abs(S[0] - min(S_gFiles))
 #alternatively, change S so it is in middle of target
-S += (np.max(S_gFiles) - np.min(S_gFiles)) / 2.0 + np.min(S_gFiles)
+#S += (np.max(S_gFiles) - np.min(S_gFiles)) / 2.0 + np.min(S_gFiles)
+#alternatively, use a predefined definition of S
+#S += 0.9*(np.max(S_gFiles) - np.min(S_gFiles)) / 2.0 + np.min(S_gFiles)
+#=== SLOW SCAN S IN ONE DIRECTION:
+S += 0.05*(np.max(S_gFiles) - np.min(S_gFiles)) + np.min(S_gFiles)
+#S += np.min(S_gFiles)
 
+print("GEQDSK dS: {:f}mm".format(np.max(S_gFiles) - np.min(S_gFiles)))
 
 #create interpolators for geqdsk
 MHD = MHDClass.setupForTerminalUse(gFile=[rootPath+x for x in gFileList])
 MHD.Spols = S_gFiles
-ts += dt
+#ts += dt
 print(ts)
 input()
 for i,t in enumerate(ts):

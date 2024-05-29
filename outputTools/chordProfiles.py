@@ -14,7 +14,7 @@ mode = 'poloidal'
 
 #point on surface center of PFC
 #sparc
-pt = np.array([1617.56,287.574,-1400.56])
+pt = np.array([1624.51,294.724,-1412.06])
 #for gunn / komm plots using Cube
 #pt = np.array([384.421, 396.983, -1603.5])
 #for NSTXU castellation
@@ -27,7 +27,7 @@ rPt = np.sqrt(pt[0]**2 + pt[1]**2)
 #toroidal
 if mode == 'toroidal':
     #gunn / komm plots gyroConvergence2
-    pt0 = np.array([380.606,400.667,-1603.5])
+    pt0 = np.array([1549.92,257.535,-1298.66])
     #for nstxu castellation
     #pt0 = np.array([469.565,287.452,-1603.62])
     #tileEnd = 29.0
@@ -46,7 +46,7 @@ else:
     #tileX1 = 28.0
 
 #max distance from the slice that we include points from on either side
-threshDist = 1.0 #mm
+threshDist = 3.0 #mm
 
 #use this to flip plot around (right=>left starting point)
 flip = True
@@ -81,10 +81,11 @@ epsFile = '/home/tom/results/NSTXU/NF_gyro_paper/castellation/images/sTor10v100.
 
 #save csv file
 writeCSV = True
-csvFile = '/home/tlooby/HEAT/data/sparc_000001_neutrinoCheck_axisymmetricT4_neutrinoGfile/000001/1Dprofile_psiN.csv'
+csvFile = '/home/tlooby/HEAT/data/sparc_000001_deepMindTest_1781_v2/0.520000000/1Dprofile_HF.csv'
 
 #if you want S in the plot to start at a global S coordinate, set this:
-sMinT4 = 1.6024564225779 #S from inner midplane
+#sMinT4 = 1.6024564225779 #S from inner midplane
+sMinT4 = 0.0 #S from start of tile
 
 #location of HF csv files (here we have three).  (un)comment as necessary
 #gunn/komm plots comparing 10eV to 100eV
@@ -94,7 +95,7 @@ sMinT4 = 1.6024564225779 #S from inner midplane
 #sparc T4
 #file1 = '/home/tlooby/HEAT/data/sparc_000001_neutrinoCheck_axisymmetricT4_neutrinoGfile/000001/HF_optical_all.csv'
 #file1 = '/home/tlooby/HEAT/data/sparc_000001_neutrinoCheck_axisymmetricT4_neutrinoGfile/000001/bdotn_all.csv'
-file1 = '/home/tlooby/HEAT/data/sparc_000001_neutrinoCheck_axisymmetricT4_neutrinoGfile/000001/psiN_all.csv'
+file1 = '/home/tlooby/HEAT/data/sparc_000001_deepMindTest_1781_v2/0.520000000/HF_optical_all.csv'
 #===============================================================================
 
 data = pd.read_csv(file1)
@@ -407,9 +408,9 @@ fig.add_annotation(
 fig.update_layout(
 #title="Temperature Probe Time Evolution",
 xaxis_title=xAxisTitle,
-#yaxis_title="Heat Flux $MW/m^2$",
+yaxis_title="Heat Flux $MW/m^2$",
 #yaxis_title="$\hat{b} \cdot \hat{n}$",
-yaxis_title="$\psi_N$",
+#yaxis_title="$\psi_N$",
 font=dict(
     family="Arial",
     size=20,

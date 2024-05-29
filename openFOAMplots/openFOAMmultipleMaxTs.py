@@ -9,7 +9,7 @@ import numpy as np
 #root = '/home/tom/HEAT/data/sparc_000001_rampup_TSCvh01a_1mm_1lq/openFoam/heatFoam/'
 #root = '/media/tom/8f18dea0-fd98-4cd0-8dcf-0af04aad82c4/work/resultsCFS/TSC_rampup_dec2022/sparc_000001_rampup_TSCvh01a_ramped4MW_dt100ms/openFoam/heatFoam/'
 #root = '/home/tlooby/HEAT/data/sparc_000001_ILIM_NX_ellipse1mm_1782_lq0.9_S0.45_temperature/openFoam/heatFoam/'
-root = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_20231206_nominal_fRadDiv70_lq0.6_S0.6/openFoam/heatFoam/'
+root = '/home/tlooby/HEAT/data/sparc_000001_ILIM_NX_ellipse1mm_1781_hybridPolBez2_PSOL10MW_temperature/openFoam/heatFoam/'
 
 nombres = [f.name for f in os.scandir(root) if f.is_dir()]
 nombres.sort()

@@ -14,7 +14,7 @@ sys.path.append(EFITPath)
 sys.path.append(HEATPath)
 import MHDClass
 
-rootPath = '/home/tlooby/projects/MEQ_EQ/originals/'
+rootPath = '/home/tlooby/projects/MEQ_EQ/tmp/'
 outPath = '/home/tlooby/projects/MEQ_EQ/corrected/'
 
 #rootPath = '/home/tlooby/source/tomTest/dummyEQ/'
@@ -45,13 +45,16 @@ newPrefix = outPath+'sparc_'
 for i,gf in enumerate(gFileList):
     try:
         f = rootPath+gf
+        print(f)
         MHD = MHDClass.setupForTerminalUse(gFile=f)
         ep = MHD.ep
     except: #EFIT reader is very specific about shot names
+        print("copying")
         newf = rootPath+'g000001.00001'
         shutil.copyfile(f, newf)
         MHD = MHDClass.setupForTerminalUse(gFile=newf)
         ep = MHD.ep
+
     ep.g['psiRZ'] *= psiRZMult
     ep.g['psiSep'] *= psiSepMult
     ep.g['psiAxis'] *= psiAxisMult
@@ -68,6 +71,7 @@ for i,gf in enumerate(gFileList):
         print(ep.g['q'])
         print(len(ep.g['q']))
     else:
-        MHD.writeGfile(outPath + newName)
+
+        MHD.writeGfile(outPath + newName, ep=ep)
 
 print("wrote all files")

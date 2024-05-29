@@ -4,12 +4,12 @@ import os
 
 
 #where the files live:
-rootDir = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_stress_lq1.5_S0.9/'
+rootDir = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_stressReX_lq0.6_S0.6_fRadDiv50/elmer/'
 t0 = 5
 dt = 5
 
 #read all files with a prefix
-prefix = 'case_'
+prefix = 'case'
 nombres = sorted([f for f in os.listdir(rootDir) if (os.path.isfile(os.path.join(rootDir, f)) and prefix in f)])
 
 

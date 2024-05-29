@@ -1,5 +1,6 @@
 #create2DRadFile.py
-#Description:   creates an axisymmetric radiation profile on a grid
+#Description:   creates an axisymmetric circular radiation profile on a grid
+#               user defines ctr and radius of circular emission profile
 #Engineer:      T Looby
 #Date:          20220614
 
@@ -7,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 #csv file to save
-pcFile = '/home/tom/source/dummyOutput/RZpower.csv'
+pcFile = '/home/tlooby/HEATruns/SPARC/xTarget_jan2024/sparc/P_RZ_xTargetTorus_mid_1MW.csv'
 
 #create R,Z grid
 #rMin = 1.0 #meters
@@ -28,7 +29,7 @@ NZ = 20
 #minor radius #[m]
 a = 0.02
 #Total power
-Ptotal = 4.212 #MW
+Ptotal = 1.0 #MW
 
 #define center manually (otherwise defined below at center of grid below)
 manualCtr = True

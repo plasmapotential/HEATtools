@@ -2,11 +2,11 @@
 
 import numpy as np
 
-f = '/home/tlooby/HEAT/data/sparc_000001/0.100000000/struct_pt005.csv'
+f = '/home/tlooby/HEAT/data/sparc_000001/0.000000000/struct_pt000.csv'
 #index where we want to stop this trace, None if we want entire trace
-idxStop = 2414
+idxStop = 80
 #direction of trace (this will be opposite what is set in HEAT trace file)
-traceDir = -1 #
+traceDir = 1 #
 if idxStop != None:
     if traceDir == 1:
         trace = np.genfromtxt(f, delimiter=',', comments='#')[:idxStop]
