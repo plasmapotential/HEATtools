@@ -16,9 +16,12 @@ sys.path.append(EFITPath)
 sys.path.append(HEATPath)
 
 #===points we are interpolating
-radPath = '/home/tlooby/HEATruns/AUG/validation39231/aug/'
-f = radPath + 'input_rad_39231.csv'
+radPath = '/home/tlooby/HEATruns/AUG/validation40240_Tom_v1/aug/'
+f = radPath + '40240_RZpower.csv'
 data = np.genfromtxt(f, comments='#', delimiter=',')
+
+#flip about z-axis if set to -1
+data[:,1] *= -1.0
 
 #define bounding box [m]
 rMin = 1.1
@@ -44,7 +47,7 @@ R,Z = np.meshgrid(r, z)
 limBound = True
 if limBound == True:
     import MHDClass
-    gFile = '/home/tlooby/HEATruns/AUG/validation39231/aug/39231_3.000.eqdsk'
+    gFile = '/home/tlooby/HEATruns/AUG/validation39231_Tom_v2/aug/39231_3.000.eqdsk'
     MHD = MHDClass.setupForTerminalUse(gFile=gFile)
     ep = MHD.ep
 
@@ -88,7 +91,7 @@ P = P.flatten()[use]
 #if you want to normalize to 1.0MW, use this line
 P /= np.sum(P)
 #if you want to normalize to a different amount of power, use this line + the last line
-P *= 3.52 #[MW]
+P *= 1.33 #[MW]
 
 #if you want to eliminate noise floor points, use this line
 noise = np.where(P<0)
@@ -96,7 +99,7 @@ P[noise] = 0.0
 
 #save CSV file with R,Z,power
 N_cells = len(R.flatten()[use])
-outFile = radPath + "P_RZ_39231_interpolated_485pts_box_3.52MW.csv"
+outFile = radPath + "P_RZ_40240_interpolated_485pts_box_1.33MW.csv"
 pc = np.zeros((N_cells, 3))
 pc[:,0] = R.flatten()[use]#*1000.0 #convert to mm
 pc[:,1] = Z.flatten()[use]#*1000.0
@@ -106,7 +109,7 @@ np.savetxt(outFile, pc, delimiter=',',fmt='%.10f', header=head)
 
 
 #save X,Y,Z,P for paraview
-xyzFile = radPath + 'P_xyz_39231_interpolated_485pts_box_3.52MW.csv'
+xyzFile = radPath + 'P_xyz_40240_interpolated_485pts_box_1.33MW.csv'
 phi = 0.0 #toroidal angle
 pc = np.zeros((N_cells, 4))
 pc[:,0] = R.flatten()[use]*1000.0 #convert to mm
