@@ -3,34 +3,38 @@ import pandas as pd
 import os
 import numpy as np
 
-field = 'max(vonmises)'
+#field = 'max(T)'
+field = 'max(rex)'
 
-case1 = 'lq0.6_S1.25_fRadDiv70'
-f1 = '/home/tlooby/HEAT/data/sparc_000001_oscillation_fixedSP_'+case1+'/elmer/max_T_stress.csv'
+f1 = '/home/tlooby/HEAT/data/sparc_000001_sweepMEQ_T4_stressReX_lq0.6_S0.6_fRadDiv50/elmer/maxParams.csv'
 data1 = pd.read_csv(f1)
+case1 = 'Max ReX'
 
-case2 = 'lq0.6_S1.25_fRadDiv70_20mm_100Hz'
-f2 = '/home/tlooby/HEAT/data/sparc_000001_oscillation_sweep_'+case2+'/elmer/max_T_stress.csv'
-data2 = pd.read_csv(f2)
+#case1 = 'lq0.6_S1.25_fRadDiv70'
+#f1 = '/home/tlooby/HEAT/data/sparc_000001_oscillation_fixedSP_'+case1+'/elmer/max_T_stress.csv'
+#data1 = pd.read_csv(f1)
+#case2 = 'lq0.6_S1.25_fRadDiv70_20mm_100Hz'
+#f2 = '/home/tlooby/HEAT/data/sparc_000001_oscillation_sweep_'+case2+'/elmer/max_T_stress.csv'
+#data2 = pd.read_csv(f2)
 
 
 
 fig = go.Figure()
 
 colors = []
-symbols = ['x', 'star', 'diamond', 'asterisk', 'bowtie', 'hourglass', 'circle-x', 'hexagram' ]
+symbols = ['circle-x', 'x', 'star', 'diamond', 'asterisk', 'bowtie', 'hourglass', 'hexagram' ]
 
 
-t = np.array(data1['Time'][:-1]*0.01+0.01)
+t = np.array(data1['Time'][:-1]*0.005+0.005)
 #Elmer FEM data
-fig.add_trace(go.Scatter(x=t, y=data1[field], name=case1, line=dict(width=2,),
-                     mode='lines+markers', marker_size=10, marker_symbol=symbols[1], 
+fig.add_trace(go.Scatter(x=t, y=data1[field], name=case1, line=dict(width=5,color='green'),
+                     mode='lines+markers', marker_size=20, marker_symbol=symbols[1], 
                      marker=dict(maxdisplayed=30)))
 
-t = np.array(data2['Time'][:-1]*0.001+0.001)
-fig.add_trace(go.Scatter(x=t, y=data2[field], name=case2, line=dict(width=2,),
-                     mode='lines+markers', marker_size=10, marker_symbol=symbols[2], 
-                     marker=dict(maxdisplayed=30)))
+#t = np.array(data2['Time'][:-1]*0.001+0.001)
+#fig.add_trace(go.Scatter(x=t, y=data2[field], name=case2, line=dict(width=2,),
+#                     mode='lines+markers', marker_size=10, marker_symbol=symbols[2], 
+#                     marker=dict(maxdisplayed=30)))
 
 
 
@@ -81,7 +85,8 @@ fig.update_layout(
     )
 
 
-fig.update_yaxes(title_text="<b>Maximum Von Mises [Pa]</b>")
+fig.update_yaxes(title_text="<b>Max ReX Fraction</b>", tickformat=".1e")
+#fig.update_yaxes(title_text="<b>Maximum Von Mises [Pa]</b>")
 #fig.update_yaxes(title_text="<b>Temperature [degC]</b>")
 fig.update_xaxes(title_text="<b>Time [s]</b>")
 

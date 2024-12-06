@@ -14,11 +14,15 @@ sys.path.append(EFITPath)
 sys.path.append(HEATPath)
 import MHDClass
 
-rootPath = '/home/tlooby/projects/MEQ_EQ/tmp/'
-outPath = '/home/tlooby/projects/MEQ_EQ/corrected/'
+#rootPath = '/home/tlooby/projects/MEQ_EQ/tmp/'
+#outPath = '/home/tlooby/projects/MEQ_EQ/corrected/'
 
 #rootPath = '/home/tlooby/source/tomTest/dummyEQ/'
 #outPath = '/home/tlooby/source/tomTest/dummyEQ/'
+
+rootPath = '/home/tlooby/projects/RE_limiter_EQ/originals/'
+outPath = '/home/tlooby/projects/RE_limiter_EQ/corrected/'
+
 netcdfOut = False
 
 #expicitly define gFileList
@@ -40,7 +44,7 @@ FpolMult = -1.0
 Bt0Mult = -1.0
 IpMult = -1.0
 
-newPrefix = outPath+'sparc_'
+newPrefix = outPath+'sparc_negBt_negFpol_negIp_psiOver2pi'
 
 for i,gf in enumerate(gFileList):
     try:

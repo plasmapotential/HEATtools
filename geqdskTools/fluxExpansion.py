@@ -18,7 +18,10 @@ import MHDClass
 N=100
 
 omp = np.array([[2.38,0.0], [2.42, 0.0]])
+#T4
 tgt = np.array([[1.57,-1.297],[1.72, -1.51]])
+#x point
+#tgt = np.array([[1.525,-1.08],[1.645, -1.162]])
 
 rootPath = '/home/tlooby/HEATruns/SPARC/axisymmetric/sparc/'
 g = 'sparc_1718.EQDSK_PsiOver2pi_negIp_negBt_negFpol'

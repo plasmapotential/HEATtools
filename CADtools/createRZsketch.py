@@ -5,14 +5,15 @@
 import os, sys
 import numpy as np
 from pathlib import Path
-FreeCADPath = '/usr/lib/freecad-daily/lib'
+#FreeCADPath = '/usr/lib/freecad-daily/lib'
+FreeCADPath = '/usr/lib/freecad-python3/lib'
 sys.path.append(FreeCADPath)
 import FreeCAD
 import Sketcher
 
 #RZ contour file to use for sketch
-name = 'IOLIM-T1'
-path = '/home/tom/work/CFS/GEQDSKs/RZcontours/PFCregionCSVs/'
+name = 'v3c'
+path = '/home/tlooby/SPARC/RZcontours/'
 rzFile = path+name+'.csv'
 #freecad file to save
 outFile = path + name +'.FCStd'
@@ -33,6 +34,10 @@ xyz[:,1] = rzPts[:,1]*1000.0 #FreeCAD has a coordinate permutation bug, dependin
 #T4
 #xyz = np.array(([[1587.2, -1321.4, 0.0],
 #                 [1720, -1510.0, 0.0]]))
+#T6
+xyz = np.array(([[1658.5, -1217.7, 0.0],
+                 [1695.0, -1380.0, 0.0]]))
+outFile = path + name +'v3c_T6.FCStd'
 
 #create sketch from RZ points
 for i in range(len(xyz)-1):
